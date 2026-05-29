@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아하오호 메이커 작품집</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --brand-black: #0B1215;
+    --brand-neon: #edff4b;
+    --pink: #FF8FA3;
+    --orange: #FFB347;
+    --blue: #7EC8E3;
+    --bg: #FFF8F0;
+    --text-main: #1a1a1a;
+    --text-sub: #666;
+    --shadow: 0 4px 24px rgba(0,0,0,0.07);
+  }
+
+  body {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    min-height: 100vh;
+  }
+
+  /* ─────────────────────────────
+     COVER
+  ───────────────────────────── */
+  .cover {
+    background: var(--brand-neon);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;   /* space-between 대신 위에서부터 쌓기 */
+    position: relative;
+    overflow: hidden;
+    padding: 52px 72px 60px;
+    gap: 32px;
+  }
+
+  /* 배경 장식 요소 — 모두 숨김 */
+  .cover-orb { display: none; }
+  .orb1, .orb2, .orb3 { display: none; }
+  .cover-scene { display: none; }
+  .cover::after { display: none; }
+
+  /* 오른쪽 대형 원형 장식 — 브랜드 블랙, 공간감 부여 */
+  .cover-deco-circle {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    background: var(--brand-black);
+    border-radius: 50%;
+    top: -120px;
+    right: -120px;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+  /* 작은 원 */
+  .cover-deco-dot {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    background: var(--brand-black);
+    border-radius: 50%;
+    bottom: -40px;
+    right: 220px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  /* 네온 악센트 바 — 배경이 네온이므로 블랙으로 */
+  .cover-neon-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--brand-black);
+    opacity: 0.15;
+  }
+
+  /* 상단: 로고 */
+  .cover-top {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+  .cover-top, .cover-main, .cover-bottom { position: relative; z-index: 2; }
+
+  .cover-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    object-fit: cover;
+  }
+
+  .crew-badge { display: none; }
+
+  /* 중단: 메인 콘텐츠 */
+  .cover-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+    text-align: left;
+    gap: 0;
+    padding: 4px 0;
+  }
+
+  .cover-logo-main {
+    width: 160px;
+    max-width: 50%;
+    margin-bottom: 36px;
+  }
+
+  .cover-title-main {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--brand-black);
+    line-height: 1.05;
+    margin-bottom: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .cover-title-main em {
+    display: inline;          /* 텍스트 너비만큼만 박스 */
+    font-style: normal;
+    background: var(--brand-black);
+    color: var(--brand-neon);
+    padding: 2px 10px 4px;
+    border-radius: 6px;
+    /* 줄바꿈 시 박스가 텍스트에 딱 붙게 */
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .cover-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(11,18,21,0.45);
+    margin-top: 18px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* 하단: 이름 + 통계 */
+  .cover-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+
+  .cover-divider {
+    width: 36px;
+    height: 3px;
+    background: var(--brand-black);
+    border-radius: 2px;
+    opacity: 0.3;
+    margin-bottom: 2px;
+  }
+
+  .cover-name {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--brand-black);
+  }
+
+  .cover-stats {
+    display: flex;
+    gap: 8px;
+  }
+
+  .stat-chip {
+    background: rgba(11,18,21,0.1);
+    border: 1.5px solid rgba(11,18,21,0.18);
+    color: rgba(11,18,21,0.7);
+    border-radius: 6px;
+    padding: 5px 13px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .stat-chip span { color: var(--brand-black); font-weight: 800; }
+
+  /* ─────────────────────────────
+     WORKS SECTION
+  ───────────────────────────── */
+  .works-section {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .section-title { font-size: 22px; font-weight: 800; }
+
+  .section-count {
+    background: var(--brand-black);
+    color: var(--brand-neon);
+    font-size: 13px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+
+  /* ─────────────────────────────
+     CARDS
+  ───────────────────────────── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.12); }
+
+  /* 미디어 영역 (단일 / 다중) */
+  .card-media {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+    position: relative;       /* 장수 뱃지 기준점 */
+  }
+
+  /* 카드 썸네일: 최대 4장까지만 표시 */
+  .card-media .media-cell:nth-child(n+5) { display: none; }
+
+  /* 이미지 장수 뱃지 */
+  .card-count-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.52);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .media-cell {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .media-cell img,
+  .media-cell video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* 썸네일: 셀을 꽉 채움 (crop) */
+  .card-media .media-cell img,
+  .card-media .media-cell video {
+    object-fit: cover;
+  }
+
+  .media-cell.video-cell { position: relative; cursor: pointer; }
+  .video-thumb { display: none; } /* 웹 기본: 숨김 */
+  /* 모달 안에서도 숨김 유지 — .media-cell img { display:block } 제압용 */
+  .modal-media .video-thumb { display: none !important; }
+  .media-cell.video-cell::after {
+    content: '▶';
+    position: absolute;
+    font-size: 20px;
+    color: white;
+    background: rgba(0,0,0,0.45);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-indent: 2px;
+  }
+
+  .card-body { padding: 16px 18px 20px; }
+
+  .card-challenge {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .card-challenge:empty,
+  .modal-challenge:empty { display: none; }
+
+  .card-title { font-size: 15px; font-weight: 700; line-height: 1.5; margin-bottom: 6px; }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .card-date { font-size: 12px; color: #bbb; font-weight: 500; }
+
+  /* ─────────────────────────────
+     MODAL
+  ───────────────────────────── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    backdrop-filter: blur(8px);
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 0;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;        /* ← 패들렛 스타일: 좌(이미지) / 우(텍스트) */
+    position: relative;
+    animation: modalIn 0.22s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* 모달 미디어 — 좌측 이미지 영역 */
+  .modal-media {
+    flex: 0 0 62%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #f0f0f0;
+  }
+
+  /* 각 슬라이드: 겹쳐 쌓기, 활성 슬라이드만 표시 */
+  .modal-media .media-cell {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(44px, 8vw, 80px);
+    background: white !important; /* 카드 인라인 배경색 오버라이드 → 흰 레터박스 */
+  }
+  .modal-media .media-cell.carousel-active {
+    display: flex;
+  }
+  /* 모달에서는 ::after 오버레이 제거 — 브라우저 controls 사용 */
+  .modal-media .media-cell.video-cell::after {
+    display: none !important;
+  }
+
+  /* 캐러셀 화살표 */
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.88);
+    border: none;
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 3;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    transition: opacity 0.15s;
+    line-height: 1;
+    color: #333;
+  }
+  .carousel-btn:disabled { opacity: 0.25; cursor: default; }
+  .carousel-btn.prev { left: 12px; }
+  .carousel-btn.next { right: 12px; }
+
+  /* 점 인디케이터 (패들렛 스타일) */
+  .carousel-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .carousel-dot {
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.18);
+    transition: width 0.2s ease, background 0.2s ease;
+    width: 6px;
+  }
+  .carousel-dot.active {
+    width: 18px;              /* 활성 점은 길쭉하게 */
+    background: rgba(0,0,0,0.5);
+  }
+
+  .modal-close {
+    position: fixed;      /* 화면 고정 — 스크롤 무관 */
+    top: 20px;
+    right: 24px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.95);
+    border: none;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 200;
+  }
+
+  /* 우측 텍스트 패널 */
+  .modal-body {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    padding: 48px 44px;
+    border-left: 1px solid #efefef;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  /* 챌린지명 = 모달 제목 */
+  .modal-challenge {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.35;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+  .modal-desc { font-size: 15px; color: var(--text-sub); line-height: 1.8; margin-bottom: 20px; }
+  .modal-date { font-size: 13px; color: #bbb; }
+
+  /* ─────────────────────────────
+     PDF 저장 버튼
+  ───────────────────────────── */
+  .print-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--brand-neon);
+    color: var(--brand-black);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Pretendard', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(237,255,75,0.2);
+    z-index: 50;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .print-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(237,255,75,0.3); }
+
+  /* ─────────────────────────────
+     FOOTER
+  ───────────────────────────── */
+  .footer { text-align: center; padding: 40px 20px; font-size: 13px; color: #bbb; }
+  .footer strong { color: var(--brand-black); font-weight: 700; }
+
+  /* ─────────────────────────────
+     RESPONSIVE
+  ───────────────────────────── */
+  @media (max-width: 700px) {
+    .cover { padding: 40px 32px 48px; }
+    .cover-title-main { font-size: 48px; }
+    .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    .cover-stats { flex-direction: column; align-items: flex-start; }
+
+    /* 모달: 모바일에서는 상하 스택 */
+    .modal {
+      flex-direction: column;
+      height: 100vh;
+    }
+    .modal-media {
+      flex: 0 0 55vh;
+      width: 100%;
+      height: 55vh;
+    }
+    .modal-body {
+      flex: 1;
+      border-left: none;
+      border-top: 1px solid #efefef;
+      justify-content: flex-start;
+      padding: 24px 28px 36px;
+    }
+  }
+  @media (max-width: 480px) {
+    .cards-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─────────────────────────────
+     인쇄 / PDF
+  ───────────────────────────── */
+  @media print {
+    @page { margin: 0; size: A4 landscape; }
+
+    body { background: white; }
+    .print-btn, .modal-overlay, .footer { display: none !important; }
+
+    /* 표지 장식 요소 */
+    .cover-orb { display: none !important; }
+    .cover-scene { display: none !important; }
+    .cover::after { display: none !important; }
+
+    /* 표지: A4 가로 한 장 */
+    .cover {
+      height: 210mm;
+      width: 297mm;
+      page-break-after: always;
+      break-after: page;
+      padding: 52px 72px 60px;
+      justify-content: space-between;   /* PDF: 상·중·하 균등 배분 */
+      gap: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      background: #edff4b !important;
+    }
+
+    .cover-neon-bar {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .cover-title-main em {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    /* 로고 필터 없음 — SVG가 이미 블랙+화이트 */
+    .cover-logo-main { filter: none; }
+
+    /* 작품 섹션 */
+    .works-section { padding: 0; max-width: 100%; }
+    .section-header { display: none; }
+    .cards-grid { grid-template-columns: 1fr; gap: 0; }
+
+    /* 카드: 1장 = A4 가로 1페이지, 이미지 좌 / 텍스트 우 */
+    .card {
+      display: flex;
+      flex-direction: row;
+      height: 210mm;
+      width: 297mm;
+      border-radius: 0;
+      box-shadow: none;
+      break-after: page;
+      page-break-after: always;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      cursor: default;
+      overflow: hidden;
+    }
+    .card:hover { transform: none; box-shadow: none; }
+
+    /* 이미지 영역: 좌측 62% */
+    .card-media {
+      width: 62%;
+      height: 210mm;
+      flex-shrink: 0;
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: 1fr;
+      gap: 2px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* 이미지 수별 그리드 */
+    .card[data-media-count="1"] .card-media {
+      grid-template-columns: 1fr;
+    }
+
+    /* 3장: 왼쪽 1장 크게(full height) + 오른쪽 2장 세로 스택 */
+    .card[data-media-count="3"] .card-media {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+    .card[data-media-count="3"] .card-media .media-cell:first-child {
+      grid-row: span 2;
+    }
+
+    /* 4장: 2×2 꽉 채움 */
+    .card[data-media-count="4"] .card-media {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    .card[data-media-count="5"] .card-media { grid-template-columns: 1fr 1fr 1fr; }
+
+    .card-media .media-cell {
+      font-size: 64px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      min-height: 0;
+    }
+
+    /* 텍스트 영역: 우측 38% */
+    .card-body {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 44px;
+      border-top: none;
+      border-left: 1px solid #efefef;
+      overflow: hidden;
+    }
+
+    .card-challenge { font-size: 20px; font-weight: 800; margin-bottom: 16px; }
+    .card-title { font-size: 26px; margin-bottom: 12px; }
+    .card-desc {
+      font-size: 14px;
+      line-height: 1.8;
+      -webkit-line-clamp: unset;
+      display: block;
+      overflow: visible;
+      margin-bottom: 20px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .card-date { font-size: 13px; }
+
+    /* 카운트 뱃지·비디오 플레이 오버레이 숨김 */
+    .card-count-badge,
+    .media-cell.video-cell::after { display: none !important; }
+
+    /* 모든 video-cell: video 숨기고 썸네일 이미지로 대체 */
+    .card-media .video-cell video { display: none !important; }
+    .card-media .video-thumb {
+      display: block !important;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    /* 5 = 이미지4 + 썸네일1 → 3+2 레이아웃 */
+    .card[data-media-count="5"] .card-media {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── COVER ── -->
+<div class="cover">
+  <!-- 네온 바 (블랙) -->
+  <div class="cover-neon-bar"></div>
+  <!-- 장식 원형 -->
+  <div class="cover-deco-circle"></div>
+  <div class="cover-deco-dot"></div>
+
+  <!-- 상단: 아하오호 로고 -->
+  <div class="cover-top">
+    <img class="cover-logo-main"
+      src="Logo1.svg"
+      onerror="this.style.display='none'">
+  </div>
+
+  <!-- 중단: 메인 타이틀 -->
+  <div class="cover-main">
+    <div class="cover-title-main">메이커<br><em>작품집</em></div>
+    <div class="cover-subtitle">Maker Portfolio</div>
+  </div>
+
+  <!-- 하단: 이름 + 통계 -->
+  <div class="cover-bottom">
+    <div class="cover-divider"></div>
+    <div class="cover-name">이희준</div>
+    <div class="cover-stats">
+      <div class="stat-chip">총 <span>9</span>개 작품</div>
+      <div class="stat-chip">2025.03.01 ~ 2025.05.16</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── WORKS ── -->
+<div class="works-section">
+  <div class="section-header">
+    <div class="section-title">작품 모아보기</div>
+    <div class="section-count">9</div>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid">
+
+    <!-- 사진 4장 (세로·가로·정사각·세로 혼합) -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge="화산 폭발 만들기"
+      data-desc="식초랑 베이킹소다를 섞었더니 진짜로 거품이 넘쳐흘렀어요. 색깔을 빨간색으로 해서 용암처럼 보이게 했어요. 다음에는 더 큰 화산을 만들어보고 싶어요!"
+      data-date="2025.05.16">
+      <div class="card-media">
+        <div class="media-cell"><img src="이미지 리소스/f825731834598441028f447c90458887.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/61fd68d22146026952732f748514bf59.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/778105fb6262d717cef54096d80812ee.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/44dd94514315cdee8a68119cf425a163.jpg" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge">화산 폭발 만들기</div>
+        <div class="card-desc">식초랑 베이킹소다를 섞었더니 진짜로 거품이 넘쳐흘렀어요. 색깔을 빨간색으로 해서 용암처럼 보이게 했어요.</div>
+        <div class="card-date">2025.05.16</div>
+      </div>
+    </div>
+
+    <!-- 사진 3장 -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge="물의 순환 실험"
+      data-desc="뜨거운 물 위에 얼음을 올렸더니 안개가 생겼어요. 실제 구름이 이렇게 만들어진다는 게 신기했어요. 수증기가 올라가서 차가워지면 구름이 된다는 게 정말 신기해요."
+      data-date="2025.05.09">
+      <div class="card-media">
+        <div class="media-cell"><img src="이미지 리소스/608b2caf9a240848c9eee8097287c376.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/86e89ed368450a55971e8447c69d13c0.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/b54aba685456d61f2f2b9fcd0cc0e390.jpg" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge">물의 순환 실험</div>
+        <div class="card-desc">뜨거운 물 위에 얼음을 올렸더니 안개가 생겼어요. 실제 구름이 이렇게 만들어진다는 게 신기했어요.</div>
+        <div class="card-date">2025.05.09</div>
+      </div>
+    </div>
+
+    <!-- 사진 1장 -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge="씨앗 발아 관찰"
+      data-desc="5일 만에 싹이 났어요! 매일 아침 관찰 일지를 썼는데 뿌리가 먼저 나오는 걸 처음 알았어요. 뿌리가 나온 다음에 줄기가 나왔어요."
+      data-date="2025.05.02">
+      <div class="card-media">
+        <div class="media-cell"><img src="이미지 리소스/videoframe_4021.png" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge">씨앗 발아 관찰</div>
+        <div class="card-desc">5일 만에 싹이 났어요! 매일 아침 관찰 일지를 썼는데 뿌리가 먼저 나오는 걸 처음 알았어요.</div>
+        <div class="card-date">2025.05.02</div>
+      </div>
+    </div>
+
+    <!-- 사진 4장 + 영상 1개 (총 5개) -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge="전기 회로 만들기"
+      data-desc="건전지, 전선, LED로 회로를 만들었어요. 처음엔 안 켜졌는데 전선 위치를 바꿨더니 켜졌어요. 직렬이랑 병렬 연결을 둘 다 해봤는데 병렬이 더 밝았어요."
+      data-date="2025.04.25">
+      <div class="card-media">
+        <div class="media-cell"><img src="이미지 리소스/512d63a41a1c7a78b25080887ac2f102.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/f825731834598441028f447c90458887.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/778105fb6262d717cef54096d80812ee.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/61fd68d22146026952732f748514bf59.jpg" alt=""></div>
+        <div class="media-cell video-cell"><video src="이미지 리소스/ea147a3447e35fc48893c6836ba3e29f.mp4" playsinline style="width:100%;height:100%;object-fit:cover;pointer-events:none;"></video><img class="video-thumb" src="이미지 리소스/videoframe_4021.png" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge">전기 회로 만들기</div>
+        <div class="card-desc">건전지, 전선, LED로 회로를 만들었어요. 처음엔 안 켜졌는데 전선 위치를 바꿨더니 켜졌어요.</div>
+        <div class="card-date">2025.04.25</div>
+      </div>
+    </div>
+
+    <!-- 사진 2장 -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge="별자리 관찰"
+      data-desc="밤에 아빠랑 같이 별을 봤어요. 오리온자리의 세 개 별이 일직선이라는 게 신기해요. 별자리 앱으로 확인하면서 찾았는데 진짜 있었어요!"
+      data-date="2025.04.18">
+      <div class="card-media">
+        <div class="media-cell"><img src="이미지 리소스/44dd94514315cdee8a68119cf425a163.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/86e89ed368450a55971e8447c69d13c0.jpg" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge">별자리 관찰</div>
+        <div class="card-desc">밤에 아빠랑 같이 별을 봤어요. 오리온자리의 세 개 별이 일직선이라는 게 신기해요.</div>
+        <div class="card-date">2025.04.18</div>
+      </div>
+    </div>
+
+    <!-- 영상 1개 -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge="자석의 힘"
+      data-desc="제일 큰 자석으로 클립 23개를 들었어요! 자석 크기가 클수록 힘이 센 게 맞는지 세 종류로 비교해봤어요. 역시 크기가 클수록 더 많이 들 수 있었어요."
+      data-date="2025.04.11">
+      <div class="card-media">
+        <div class="media-cell video-cell"><video src="이미지 리소스/ea147a3447e35fc48893c6836ba3e29f.mp4" playsinline style="width:100%;height:100%;object-fit:cover;pointer-events:none;"></video><img class="video-thumb" src="이미지 리소스/videoframe_4021.png" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge">자석의 힘</div>
+        <div class="card-desc">제일 큰 자석으로 클립 23개를 들었어요! 자석 크기가 클수록 힘이 센 게 맞는지 비교해봤어요.</div>
+        <div class="card-date">2025.04.11</div>
+      </div>
+    </div>
+
+    <!-- 사진 3장 -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge="색 혼합 실험"
+      data-desc="빛의 삼원색으로 색을 섞으면 밝아진다는 걸 배웠어요. 물감이랑 반대라서 처음엔 헷갈렸어요. 빨강+초록이 노란색이 된다는 게 정말 신기했어요!"
+      data-date="2025.04.04">
+      <div class="card-media">
+        <div class="media-cell"><img src="이미지 리소스/608b2caf9a240848c9eee8097287c376.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/b54aba685456d61f2f2b9fcd0cc0e390.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/512d63a41a1c7a78b25080887ac2f102.jpg" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge">색 혼합 실험</div>
+        <div class="card-desc">빛의 삼원색으로 색을 섞으면 밝아진다는 걸 배웠어요. 물감이랑 반대라서 헷갈렸어요.</div>
+        <div class="card-date">2025.04.04</div>
+      </div>
+    </div>
+
+    <!-- 사진 4장 -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge="광합성 실험"
+      data-desc="화분 잎 일부를 검은 종이로 가렸더니 3일 후에 노랗게 변했어요. 광합성이 정말 중요하다는 걸 알게 됐어요. 빛이 없으면 식물이 얼마나 힘든지 느꼈어요."
+      data-date="2025.03.28">
+      <div class="card-media">
+        <div class="media-cell"><img src="이미지 리소스/f825731834598441028f447c90458887.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/61fd68d22146026952732f748514bf59.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/778105fb6262d717cef54096d80812ee.jpg" alt=""></div>
+        <div class="media-cell"><img src="이미지 리소스/videoframe_4021.png" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge">광합성 실험</div>
+        <div class="card-desc">화분 잎 일부를 검은 종이로 가렸더니 3일 후에 노랗게 변했어요. 광합성이 정말 중요하다는 걸 알게 됐어요.</div>
+        <div class="card-date">2025.03.28</div>
+      </div>
+    </div>
+
+    <!-- 사진 1장 -->
+    <div class="card" onclick="openModal(this)"
+      data-challenge=""
+      data-desc="네모난 틀로 불어도 방울은 동그래졌어요. 표면장력 때문이라는 걸 알게 됐어요. 비눗물 농도를 다르게 해서 어떤 게 더 오래 터지지 않는지도 실험해봤어요."
+      data-date="2025.03.21">
+      <div class="card-media">
+        <div class="media-cell"><img src="이미지 리소스/b54aba685456d61f2f2b9fcd0cc0e390.jpg" alt=""></div>
+      </div>
+      <div class="card-body">
+        <div class="card-challenge"></div>
+        <div class="card-desc">네모난 틀로 불어도 방울은 동그래졌어요. 표면장력 때문이라는 걸 알게 됐어요.</div>
+        <div class="card-date">2025.03.21</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<div class="footer">
+  <strong>아하오호</strong>에서 만든 창작 기록 · futurelab.center
+</div>
+
+<!-- ── PDF 저장 버튼 ── -->
+<button class="print-btn" onclick="window.print()">📄 PDF로 저장</button>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal">
+    <div class="modal-media" id="modalMedia">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-challenge" id="modalChallenge"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-date" id="modalDate"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── 초기화: 카드별 data-media-count + 장수 뱃지 ──
+  document.querySelectorAll('.card').forEach(card => {
+    const cells = card.querySelectorAll('.card-media .media-cell'); // card-media만 카운트
+    const count = cells.length;
+    card.setAttribute('data-media-count', String(count));
+
+    // 2장 이상일 때 썸네일 우하단에 장수 표시
+    if (count > 1) {
+      const badge = document.createElement('div');
+      badge.className = 'card-count-badge';
+      badge.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg> ${count}`;
+      card.querySelector('.card-media').appendChild(badge);
+    }
+  });
+
+  // ── 모달 열기 (캐러셀) ──
+  function openModal(card) {
+    const d = card.dataset;
+    const modalMedia = document.getElementById('modalMedia');
+
+    // 모달 미디어 초기화
+    modalMedia.innerHTML = '';
+
+    // 닫기 버튼
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'modal-close';
+    closeBtn.innerHTML = '✕';
+    closeBtn.onclick = closeModal;
+    modalMedia.appendChild(closeBtn);
+
+    // card-media의 모든 media-cell 복제 (숨겨진 5번째도 포함)
+    const allCells = [...card.querySelectorAll('.card-media .media-cell')];
+    const total = allCells.length;
+
+    allCells.forEach((cell, i) => {
+      const clone = cell.cloneNode(true);
+      clone.style.display = '';
+      if (i === 0) clone.classList.add('carousel-active');
+      // 모달에서는 video에 controls 추가, pointer-events 복구
+      const vid = clone.querySelector('video');
+      if (vid) {
+        vid.setAttribute('controls', '');
+        vid.style.pointerEvents = '';
+      }
+      modalMedia.appendChild(clone);
+    });
+
+    // 2장 이상이면 화살표 + 점 인디케이터 추가
+    if (total > 1) {
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'carousel-btn prev';
+      prevBtn.innerHTML = '‹';
+      prevBtn.disabled = true;
+      prevBtn.onclick = e => { e.stopPropagation(); carouselNav(-1); };
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'carousel-btn next';
+      nextBtn.innerHTML = '›';
+      nextBtn.onclick = e => { e.stopPropagation(); carouselNav(1); };
+
+      // 점 인디케이터
+      const dotsWrap = document.createElement('div');
+      dotsWrap.className = 'carousel-dots';
+      dotsWrap.id = 'carouselDots';
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        dotsWrap.appendChild(dot);
+      }
+
+      modalMedia.appendChild(prevBtn);
+      modalMedia.appendChild(nextBtn);
+      modalMedia.appendChild(dotsWrap);
+    }
+
+    // 텍스트 (챌린지명이 제목)
+    document.getElementById('modalChallenge').textContent = d.challenge || '';
+    document.getElementById('modalDesc').textContent = d.desc;
+    document.getElementById('modalDate').textContent = d.date;
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // ── 캐러셀 네비게이션 ──
+  function carouselNav(dir) {
+    const modalMedia = document.getElementById('modalMedia');
+    const cells = [...modalMedia.querySelectorAll('.media-cell')];
+    const total = cells.length;
+    const currentIdx = cells.findIndex(c => c.classList.contains('carousel-active'));
+    const nextIdx = currentIdx + dir;
+    if (nextIdx < 0 || nextIdx >= total) return;
+
+    cells[currentIdx].classList.remove('carousel-active');
+    cells[nextIdx].classList.add('carousel-active');
+
+    // 점 인디케이터 업데이트
+    const dots = document.querySelectorAll('#carouselDots .carousel-dot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === nextIdx));
+
+    const prevBtn = modalMedia.querySelector('.carousel-btn.prev');
+    const nextBtn = modalMedia.querySelector('.carousel-btn.next');
+    if (prevBtn) prevBtn.disabled = (nextIdx === 0);
+    if (nextBtn) nextBtn.disabled = (nextIdx === total - 1);
+  }
+
+  // ── 모달 닫기 ──
+  function closeModal() {
+    // 재생 중인 영상 모두 정지
+    document.querySelectorAll('#modalMedia video').forEach(v => {
+      v.pause();
+      v.currentTime = 0;
+    });
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOnBg(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  // 키보드: Esc 닫기 + ← → 캐러셀
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'ArrowLeft')  carouselNav(-1);
+    if (e.key === 'ArrowRight') carouselNav(1);
+  });
+</script>
+
+</body>
+</html>
