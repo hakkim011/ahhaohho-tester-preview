@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시드 프로젝트 선정 보드</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --brand-black: #0B1215;
+    --brand-neon: #edff4b;
+    --bg: #FFF8F0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.07);
+  }
+
+  body {
+    font-family: 'Pretendard', sans-serif;
+    background: var(--bg);
+    color: var(--brand-black);
+  }
+
+  .page {
+    width: 1200px;
+    margin: 0 auto;
+    background: var(--bg);
+  }
+
+  /* ─── 헤더 ─── */
+  .board-header {
+    background: var(--brand-neon);
+    padding: 44px 64px 48px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  /* 배경 장식 — 원 */
+  .header-deco-circle {
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    top: -100px;
+    right: -80px;
+    pointer-events: none;
+    opacity: 1;
+  }
+  .header-deco-dot {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    background: var(--brand-black);
+    border-radius: 50%;
+    bottom: -40px;
+    right: 240px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .board-logo {
+    width: 120px;
+  }
+
+  .board-title {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--brand-black);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .board-title em {
+    display: inline;
+    font-style: normal;
+    background: var(--brand-black);
+    color: var(--brand-neon);
+    padding: 2px 12px 5px;
+    border-radius: 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .board-meta {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(11,18,21,0.45);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .header-count-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(11,18,21,0.4);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .header-count-num {
+    font-family: 'Poppins', sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--brand-black);
+    opacity: 0.15;
+    line-height: 1;
+  }
+
+  /* ─── 카드 그리드 ─── */
+  .board-body {
+    padding: 40px 64px 64px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .seed-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .seed-card-image-wrap {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #e8e8e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .seed-card-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* 이미지 없을 때 플레이스홀더 */
+  .seed-card-image-wrap .placeholder-icon {
+    font-size: 36px;
+    opacity: 0.3;
+  }
+
+  .seed-card-body {
+    padding: 14px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex: 1;
+  }
+
+  .seed-card-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .name-text {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--brand-black);
+  }
+
+  .seed-badge {
+    background: var(--brand-neon);
+    color: var(--brand-black);
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 100px;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  .seed-card-reason {
+    font-size: 12.5px;
+    color: rgba(11,18,21,0.55);
+    line-height: 1.55;
+    word-break: keep-all;
+  }
+
+  /* ─── 저장 버튼 ─── */
+  .print-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--brand-black);
+    color: var(--brand-neon);
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    transition: transform 0.15s;
+  }
+  .print-btn:hover { transform: translateY(-2px); }
+
+  /* ─── 인쇄 / PDF ─── */
+  @media print {
+    @page { margin: 0; size: A3 landscape; }
+    body { background: white; }
+    .print-btn { display: none !important; }
+    .page { width: 100%; }
+
+    .board-header {
+      padding: 36px 48px 40px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      background: #edff4b !important;
+    }
+    .board-title em {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .seed-badge {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .board-body { padding: 28px 48px 48px; }
+    .cards-grid { gap: 14px; }
+    .seed-card { box-shadow: none; border: 1px solid #ebebeb; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- 헤더 -->
+  <div class="board-header">
+
+    <!-- 배경 장식 — 토성 -->
+    <svg class="header-deco-circle" viewBox="0 0 420 420" overflow="visible" xmlns="http://www.w3.org/2000/svg">
+      <g opacity="0.08">
+        <ellipse fill="none" stroke="#0b1215" stroke-width="3.5" cx="210" cy="210" rx="178" ry="71"/>
+        <ellipse fill="none" stroke="#0b1215" stroke-width="2.5" cx="210" cy="210" rx="198" ry="79"/>
+        <ellipse fill="none" stroke="#0b1215" stroke-width="2"   cx="210" cy="210" rx="216" ry="86"/>
+        <ellipse fill="none" stroke="#0b1215" stroke-width="1.5" cx="210" cy="210" rx="232" ry="93"/>
+        <circle  fill="#0b1215" cx="210" cy="210" r="162"/>
+      </g>
+    </svg>
+    <div class="header-deco-dot"></div>
+
+    <div class="header-left">
+      <img class="board-logo" src="Logo1.svg" onerror="this.style.display='none'">
+      <div class="board-title">이번 주<br><em>시드 프로젝트</em></div>
+      <!-- ✏️ 기수 · 주차 · 날짜 수정 -->
+      <div class="board-meta">3기 · 3주차 · 2025.04.01</div>
+    </div>
+
+    <div class="header-right">
+      <div class="header-count-label">Selected</div>
+      <!-- ✏️ 선정 수 수정 -->
+      <div class="header-count-num">04</div>
+    </div>
+
+  </div>
+
+  <!-- 카드 그리드 -->
+  <div class="board-body">
+    <div class="cards-grid">
+
+      <!-- ✏️ 카드 복사·삭제해서 수 조절 -->
+
+      <div class="seed-card">
+        <div class="seed-card-image-wrap">
+          <!-- ✏️ src에 이미지 경로 입력. 없으면 아래 줄 삭제 -->
+          <img src="이미지 리소스/작품1.jpg" onerror="this.parentNode.innerHTML='<div class=\'placeholder-icon\'>🖼️</div>'">
+        </div>
+        <div class="seed-card-body">
+          <div class="seed-card-name">
+            <span class="name-text">이희준</span><!-- ✏️ 이름 -->
+            <span class="seed-badge">SEED</span>
+          </div>
+          <div class="seed-card-reason">주제를 독창적으로 해석하고 설명을 꼼꼼하게 작성했어요.</div><!-- ✏️ 선정 이유 -->
+        </div>
+      </div>
+
+      <div class="seed-card">
+        <div class="seed-card-image-wrap">
+          <img src="이미지 리소스/작품2.jpg" onerror="this.parentNode.innerHTML='<div class=\'placeholder-icon\'>🖼️</div>'">
+        </div>
+        <div class="seed-card-body">
+          <div class="seed-card-name">
+            <span class="name-text">김지민</span>
+            <span class="seed-badge">SEED</span>
+          </div>
+          <div class="seed-card-reason">아이디어가 신선하고 다른 메이커들에게 영감을 줄 수 있는 작품이에요.</div>
+        </div>
+      </div>
+
+      <div class="seed-card">
+        <div class="seed-card-image-wrap">
+          <img src="이미지 리소스/작품3.jpg" onerror="this.parentNode.innerHTML='<div class=\'placeholder-icon\'>🖼️</div>'">
+        </div>
+        <div class="seed-card-body">
+          <div class="seed-card-name">
+            <span class="name-text">박서연</span>
+            <span class="seed-badge">SEED</span>
+          </div>
+          <div class="seed-card-reason">완성도 높은 결과물과 함께 과정을 잘 기록했어요.</div>
+        </div>
+      </div>
+
+      <div class="seed-card">
+        <div class="seed-card-image-wrap">
+          <img src="이미지 리소스/작품4.jpg" onerror="this.parentNode.innerHTML='<div class=\'placeholder-icon\'>🖼️</div>'">
+        </div>
+        <div class="seed-card-body">
+          <div class="seed-card-name">
+            <span class="name-text">최민준</span>
+            <span class="seed-badge">SEED</span>
+          </div>
+          <div class="seed-card-reason">소통을 활발하게 하며 커뮤니티에 긍정적인 영향을 줬어요.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ PDF / 이미지로 저장</button>
+
+</body>
+</html>
