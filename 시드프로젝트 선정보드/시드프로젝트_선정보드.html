@@ -300,10 +300,20 @@
   /* Cards */
   .board-body { padding: 40px 64px 64px; }
 
-  .board-grid {
+  /* 카드 행 (4개씩) — 페이지 중간에 잘리지 않게 */
+  .board-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+    margin-bottom: 20px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .board-row:last-child { margin-bottom: 0; }
+
+  /* 2페이지~: 헤더 없이 카드만 */
+  .board-continuation {
+    padding: 40px 64px 64px;
   }
 
   .b-card {
@@ -377,6 +387,10 @@
     .board-title em { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .b-card-tag { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .b-card { box-shadow: none; border: 1px solid #ebebeb; }
+    .board-continuation {
+      break-before: page;
+      page-break-before: always;
+    }
   }
 </style>
 </head>
@@ -547,11 +561,41 @@ function escHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+/* ── 카드 1개 HTML ── */
+function cardHtml(card) {
+  return `
+    <div class="b-card">
+      <div class="b-card-img">
+        ${card.image ? `<img src="${card.image}">` : `<div class="no-img">🖼️</div>`}
+      </div>
+      <div class="b-card-body">
+        <div class="b-card-name">${escHtml(card.name) || '이름'}</div>
+        ${card.challenge ? `<div><span class="b-card-tag">${escHtml(card.challenge)}</span></div>` : ''}
+        <div class="b-card-reason">${escHtml(card.reason)}</div>
+      </div>
+    </div>`;
+}
+
+/* 카드 배열 → 4개씩 행으로 묶어서 HTML 반환 */
+function rowsHtml(group) {
+  let html = '';
+  for (let i = 0; i < group.length; i += 4) {
+    html += `<div class="board-row">${group.slice(i, i + 4).map(cardHtml).join('')}</div>`;
+  }
+  return html;
+}
+
 /* ── RENDER BOARD ── */
 function render() {
   const { kisu, week, period } = getInfo();
   const metaParts = [kisu, week, period].filter(Boolean);
-  const count = String(cards.length).padStart(2, '0');
+
+  // 1페이지: 헤더 + 최대 8장 / 2페이지~: 12장씩
+  const page1Cards = cards.slice(0, 8);
+  const restPages = [];
+  for (let i = 8; i < cards.length; i += 12) {
+    restPages.push(cards.slice(i, i + 12));
+  }
 
   document.getElementById('board').innerHTML = `
     <div class="board-header">
@@ -571,28 +615,16 @@ function render() {
         <div class="board-title">이번 주<br><em>시드 프로젝트</em></div>
         ${metaParts.length ? `<div class="board-meta">${metaParts.join(' · ')}</div>` : ''}
       </div>
-      <div class="hd-right">
-        <div class="hd-count-label">Selected</div>
-        <div class="hd-count-num">${count}</div>
-      </div>
+      <div class="hd-right"></div>
     </div>
     <div class="board-body">
       ${cards.length === 0
         ? `<div class="board-empty">← 왼쪽에서 카드를 추가해보세요</div>`
-        : `<div class="board-grid">
-            ${cards.map(card => `
-              <div class="b-card">
-                <div class="b-card-img">
-                  ${card.image ? `<img src="${card.image}">` : `<div class="no-img">🖼️</div>`}
-                </div>
-                <div class="b-card-body">
-                  <div class="b-card-name">${escHtml(card.name) || '이름'}</div>
-                  ${card.challenge ? `<div><span class="b-card-tag">${escHtml(card.challenge)}</span></div>` : ''}
-                  <div class="b-card-reason">${escHtml(card.reason)}</div>
-                </div>
-              </div>`).join('')}
-          </div>`}
+        : rowsHtml(page1Cards)}
     </div>
+    ${restPages.map(group => `
+      <div class="board-continuation">${rowsHtml(group)}</div>
+    `).join('')}
   `;
   scaleBoard();
 }
