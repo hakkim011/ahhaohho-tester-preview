@@ -388,6 +388,7 @@
     .b-card-body { height: auto !important; overflow: visible !important; }
     .b-card-reason { overflow: visible !important; display: block !important; -webkit-line-clamp: unset !important; }
     .board-body { padding: 28px 48px 32px; break-after: avoid; page-break-after: avoid; }
+    .cont-footer { display: none !important; }
     .board-row { gap: 16px; margin-bottom: 16px; break-inside: avoid; }
     #board { break-inside: avoid-page; }
     .board-continuation {
@@ -629,7 +630,7 @@ function render() {
       return `
       <div class="board-continuation">
         ${rowsHtml(group)}
-        <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(11,18,21,0.08);display:flex;align-items:center;justify-content:space-between;">
+        <div class="cont-footer" style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(11,18,21,0.08);display:flex;align-items:center;justify-content:space-between;">
           <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:rgba(11,18,21,0.35);font-weight:500">아크크 ${[kisu, weekLabel].filter(Boolean).join(' ')} 시드 프로젝트</span>
           <span style="font-family:'Poppins',sans-serif;font-size:12px;color:rgba(11,18,21,0.25);font-weight:600">${pageNum} / ${totalPages}</span>
         </div>
