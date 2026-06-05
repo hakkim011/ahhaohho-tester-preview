@@ -385,8 +385,8 @@
     .board-title em { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .b-card-tag { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .b-card { box-shadow: none; border: 1px solid #ebebeb; }
-    /* 카드 높이 인쇄용 축소 — A3 기준 2행(6장) 맞춤 */
-    .b-card-body { height: 105px !important; }
+    .b-card-body { height: auto !important; overflow: visible !important; }
+    .b-card-reason { overflow: visible !important; display: block !important; -webkit-line-clamp: unset !important; }
     .board-body { padding: 28px 48px 32px; }
     .board-row { gap: 16px; margin-bottom: 16px; }
     .board-continuation {
