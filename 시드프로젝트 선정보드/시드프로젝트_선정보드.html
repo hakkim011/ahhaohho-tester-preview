@@ -248,7 +248,7 @@
 
   .board-header {
     background: var(--brand-neon);
-    padding: 44px 64px 48px;
+    padding: 64px 64px 72px;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -590,11 +590,11 @@ function render() {
   const { kisu, week, period } = getInfo();
   const metaParts = [kisu, week, period].filter(Boolean);
 
-  // 1페이지: 헤더 + 최대 6장 / 2페이지~: 9장씩
+  // 1페이지: 헤더 + 최대 6장 / 2페이지~: 6장씩
   const page1Cards = cards.slice(0, 6);
   const restPages = [];
-  for (let i = 6; i < cards.length; i += 9) {
-    restPages.push(cards.slice(i, i + 9));
+  for (let i = 6; i < cards.length; i += 6) {
+    restPages.push(cards.slice(i, i + 6));
   }
 
   document.getElementById('board').innerHTML = `
