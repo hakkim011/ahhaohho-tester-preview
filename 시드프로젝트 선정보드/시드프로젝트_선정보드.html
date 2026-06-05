@@ -597,10 +597,10 @@ function render() {
   const { kisu, week, period } = getInfo();
   const metaParts = [kisu, week, period].filter(Boolean);
 
-  // 1페이지: 헤더 + 최대 6장 / 2페이지~: 6장씩
-  const page1Cards = cards.slice(0, 6);
+  // 1페이지: 헤더 + 3장 / 2페이지~: 6장씩
+  const page1Cards = cards.slice(0, 3);
   const restPages = [];
-  for (let i = 6; i < cards.length; i += 6) {
+  for (let i = 3; i < cards.length; i += 6) {
     restPages.push(cards.slice(i, i + 6));
   }
 
