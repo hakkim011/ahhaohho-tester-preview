@@ -445,6 +445,12 @@
     </div>
 
     <div class="editor-footer">
+      <!-- 파일 저장/불러오기 -->
+      <div style="display:flex;gap:7px;margin-bottom:2px">
+        <button class="exp-btn secondary" style="flex:1" onclick="saveToFile()">💾 파일로 저장</button>
+        <button class="exp-btn secondary" style="flex:1" onclick="document.getElementById('load-file-input').click()">📂 불러오기</button>
+        <input type="file" id="load-file-input" accept=".json" style="display:none" onchange="loadFromFile(this)">
+      </div>
       <button class="exp-btn primary" onclick="exportImage()">🖼️ 이미지로 저장 (페이지별)</button>
       <button class="exp-btn secondary" onclick="window.print()">🖨️ PDF로 저장</button>
     </div>
@@ -464,6 +470,67 @@
 /* ── STATE ── */
 let cards = [];
 let nextId = 1;
+
+/* ── 파일 저장 ── */
+function saveToFile() {
+  const { kisu, week, period } = getInfo();
+  const state = {
+    kisu:      document.getElementById('in-kisu').value,
+    week:      document.getElementById('in-week').value,
+    dateStart: document.getElementById('in-date-start').value,
+    dateEnd:   document.getElementById('in-date-end').value,
+    cards:     cards.map(c => ({
+      id: c.id, name: c.name, challenge: c.challenge, reason: c.reason,
+      image: c.image || null   // base64 포함
+    })),
+  };
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const a = document.createElement('a');
+  const fileName = ['아크크', ...[kisu, week].filter(Boolean), '시드 프로젝트'].join(' ') + '.json';
+  a.download = fileName;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ── 파일 불러오기 ── */
+function loadFromFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const state = JSON.parse(e.target.result);
+      // 헤더 정보 복원
+      document.getElementById('in-kisu').value       = state.kisu || '';
+      document.getElementById('in-week').value       = state.week || '';
+      document.getElementById('in-date-start').value = state.dateStart || '';
+      document.getElementById('in-date-end').value   = state.dateEnd || '';
+      // 카드 복원
+      cards = (state.cards || []).map(c => ({
+        id: c.id || Date.now() + Math.random(),
+        name: c.name || '', challenge: c.challenge || '',
+        reason: c.reason || '', image: c.image || null,
+      }));
+      nextId = cards.length ? Math.max(...cards.map(c => c.id)) + 1 : 1;
+      renderEditorCards();
+      render();
+      // 이미지 영역 복원
+      cards.forEach(card => {
+        if (card.image) {
+          const area = document.getElementById('img-area-' + card.id);
+          if (area) area.innerHTML = `<img src="${card.image}" style="width:100%;height:100%;object-fit:cover;">
+            <input type="file" id="file-${card.id}" accept="image/*" style="display:none" onchange="handleImage(this,${card.id})">`;
+        }
+      });
+    } catch {
+      alert('파일을 불러오는 데 실패했어요. 올바른 JSON 파일인지 확인해주세요.');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
 
 /* ── 디바운스 렌더 — 타이핑 멈춘 후 300ms 뒤 한 번만 렌더 ── */
 let renderTimer = null;
