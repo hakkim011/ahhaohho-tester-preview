@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AhhaOhho Admin — 체험단 관리 (프로토타입)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', sans-serif; background: white; color: #050505; min-height: 100vh; }
+
+  /* ── GNB ── */
+  .gnb {
+    width: 100%; height: 64px;
+    background: white;
+    border-bottom: 1px solid rgba(5,5,5,0.05);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+    position: fixed; top: 0; left: 0; z-index: 100;
+  }
+  .gnb-left { display: flex; align-items: center; gap: 12px; }
+  .gnb-logo {
+    width: 40px; height: 40px;
+    background: #edff4b; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 13px; color: #050505;
+  }
+  .gnb-title { font-size: 22px; font-weight: 700; color: #111; letter-spacing: -0.5px; }
+  .gnb-right { display: flex; align-items: center; gap: 16px; }
+  .gnb-user { font-size: 13px; color: #69665d; }
+  .btn-logout {
+    padding: 6px 12px; font-size: 12px; font-weight: 500;
+    border: 1px solid #d1d5db; border-radius: 6px;
+    background: white; color: #374151; cursor: pointer;
+  }
+  .btn-logout:hover { background: #f9fafb; }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; padding-top: 64px; height: 100vh; }
+
+  /* ── SNB ── */
+  .snb {
+    width: 286px; flex-shrink: 0;
+    background: white;
+    border-right: 1px solid rgba(5,5,5,0.05);
+    padding: 24px 16px;
+    overflow-y: auto;
+    position: fixed; top: 64px; left: 0; bottom: 0;
+  }
+  .snb-item {
+    height: 48px; border-radius: 8px;
+    display: flex; align-items: center;
+    padding: 0 16px; cursor: pointer;
+    font-size: 16px; color: rgba(5,5,5,0.85);
+    text-decoration: none;
+    transition: background 0.1s;
+    margin-bottom: 2px;
+  }
+  .snb-item:hover { background: #f9fafb; }
+  .snb-item.active { background: #fef6d2; font-weight: 700; }
+  .snb-icon { width: 20px; height: 20px; margin-right: 12px; flex-shrink: 0; }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    margin-left: 286px;
+    overflow-y: auto;
+    height: calc(100vh - 64px);
+  }
+  .content { padding: 32px; max-width: 1200px; }
+
+  /* ── PAGE HEADER ── */
+  .page-header { margin-bottom: 24px; }
+  .page-title { font-size: 22px; font-weight: 700; color: #050505; letter-spacing: -0.3px; }
+  .page-desc { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; border-bottom: 1px solid #e5e7eb; margin-bottom: 24px; }
+  .tab-btn {
+    padding: 10px 16px; font-size: 14px; font-weight: 500;
+    border: none; background: none; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    color: #6b7280; transition: color 0.15s;
+  }
+  .tab-btn:hover { color: #374151; }
+  .tab-btn.active { border-bottom-color: #050505; color: #050505; font-weight: 600; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .toolbar-right { margin-left: auto; }
+
+  .select-sm {
+    padding: 7px 28px 7px 10px; font-size: 13px;
+    border: 1px solid #d1d5db; border-radius: 8px;
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 8px center;
+    appearance: none; cursor: pointer; color: #374151;
+    outline: none;
+  }
+  .select-sm:focus { border-color: #050505; }
+
+  .input-search {
+    padding: 7px 12px; font-size: 13px;
+    border: 1px solid #d1d5db; border-radius: 8px;
+    width: 220px; outline: none; color: #374151;
+  }
+  .input-search:focus { border-color: #050505; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    padding: 8px 16px; font-size: 13px; font-weight: 600;
+    background: #050505; color: white; border: none;
+    border-radius: 8px; cursor: pointer; transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #333; }
+
+  .btn-secondary {
+    padding: 7px 12px; font-size: 12px; font-weight: 500;
+    background: white; color: #374151;
+    border: 1px solid #d1d5db; border-radius: 6px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-secondary:hover { background: #f9fafb; }
+
+  .btn-danger {
+    padding: 5px 10px; font-size: 12px; font-weight: 500;
+    background: white; color: #dc2626;
+    border: 1px solid #fca5a5; border-radius: 6px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-danger:hover { background: #fef2f2; }
+
+  /* ── TABLE ── */
+  .table-wrap { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+  thead th {
+    padding: 10px 16px; text-align: left;
+    font-size: 11px; font-weight: 600; color: #6b7280;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  tbody tr { border-bottom: 1px solid #f3f4f6; transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f9fafb; }
+  tbody td { padding: 12px 16px; font-size: 13px; color: #374151; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 8px; border-radius: 100px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-active { background: #dcfce7; color: #166534; }
+  .badge-dropped { background: #f3f4f6; color: #6b7280; }
+  .badge-running { background: #dbeafe; color: #1e40af; }
+  .badge-ended { background: #f3f4f6; color: #6b7280; }
+  .badge-pending  { background: #f3f4f6; color: #9ca3af; }
+  .badge-inq-new  { background: #fee2e2; color: #dc2626; }
+  .badge-inq-prog { background: #fef3c7; color: #d97706; }
+  .badge-inq-done { background: #dcfce7; color: #166534; }
+
+  /* ── STAT CARDS ── */
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: white; border: 1px solid #e5e7eb;
+    border-radius: 12px; padding: 20px 24px;
+  }
+  .stat-label { font-size: 12px; color: #6b7280; font-weight: 500; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 800; color: #050505; letter-spacing: -0.5px; }
+  .stat-sub { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 16px;
+    padding: 28px; width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; color: #050505; margin-bottom: 20px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+  .form-required { color: #dc2626; margin-left: 2px; }
+  .form-input {
+    width: 100%; padding: 9px 12px; font-size: 14px;
+    border: 1px solid #d1d5db; border-radius: 8px;
+    outline: none; font-family: inherit; color: #050505;
+  }
+  .form-input:focus { border-color: #050505; box-shadow: 0 0 0 3px rgba(5,5,5,0.06); }
+  .form-select {
+    width: 100%; padding: 9px 12px; font-size: 14px;
+    border: 1px solid #d1d5db; border-radius: 8px;
+    outline: none; font-family: inherit; color: #050505;
+    background: white; cursor: pointer;
+  }
+  .form-select:focus { border-color: #050505; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-hint { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+  /* search result list */
+  .search-results {
+    border: 1px solid #e5e7eb; border-radius: 8px;
+    overflow: hidden; margin-top: 8px;
+    display: none;
+  }
+  .search-results.show { display: block; }
+  .search-result-item {
+    padding: 10px 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f3f4f6; font-size: 13px;
+    transition: background 0.1s;
+  }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover { background: #f9fafb; }
+  .search-result-item.selected { background: #fef6d2; }
+  .search-result-name { font-weight: 600; color: #050505; }
+  .search-result-phone { color: #9ca3af; font-size: 12px; }
+
+  /* confirm modal */
+  .modal-sm { width: 360px; }
+  .modal-desc { font-size: 14px; color: #6b7280; line-height: 1.6; margin-bottom: 4px; }
+
+  /* empty state */
+  .empty-state { text-align: center; padding: 60px 0; color: #9ca3af; font-size: 14px; }
+
+  /* tab content */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── 기수 버튼 필터 ── */
+  .cohort-filter-row {
+    display: flex; gap: 8px; margin-bottom: 16px;
+  }
+  .cohort-btn {
+    padding: 7px 18px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid #e5e7eb; border-radius: 100px;
+    background: white; color: #6b7280; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cohort-btn:hover { border-color: #050505; color: #050505; }
+  .cohort-btn.active {
+    background: #050505; color: white;
+    border-color: #050505;
+  }
+
+  /* ── 페이지 래퍼 ── */
+  .page-wrap { display: block; }
+
+  /* ── 게시물 그리드 ── */
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .post-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: box-shadow 0.15s;
+  }
+  .post-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .post-card.is-hidden .post-thumb,
+  .post-card.is-hidden .post-body { opacity: 0.45; }
+  .post-card.is-hidden .post-actions { opacity: 1; }
+
+  .post-thumb {
+    width: 100%; aspect-ratio: 4/3;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; position: relative;
+    flex-shrink: 0;
+  }
+
+  .post-thumb-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+    background: rgba(0,0,0,0.45); color: white;
+  }
+
+  .post-badges {
+    position: absolute; top: 8px; left: 8px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+
+  .post-body { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+  .post-challenge {
+    font-size: 11px; font-weight: 700; color: #6b7280;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .post-author { font-size: 13px; font-weight: 700; color: #050505; }
+  .post-author-nick { font-weight: 400; color: #9ca3af; font-size: 12px; }
+  .post-date { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+  .post-seed-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 8px; border-radius: 100px; width: fit-content;
+    margin-top: 4px;
+  }
+  .seed-challenge { background: #dcfce7; color: #166534; }
+  .seed-idea { background: #fef9c3; color: #854d0e; }
+
+  .post-actions {
+    display: flex; gap: 4px; padding: 8px 12px 12px; flex-wrap: wrap;
+  }
+  .btn-xs {
+    padding: 4px 9px; font-size: 11px; font-weight: 600;
+    border-radius: 6px; border: 1px solid; cursor: pointer;
+    transition: background 0.12s;
+  }
+  .btn-xs-seed { background: white; color: #166534; border-color: #86efac; }
+  .btn-xs-seed:hover { background: #f0fdf4; }
+  .btn-xs-hide { background: white; color: #374151; border-color: #d1d5db; }
+  .btn-xs-hide:hover { background: #f9fafb; }
+  .btn-xs-show { background: white; color: #1d4ed8; border-color: #93c5fd; }
+  .btn-xs-show:hover { background: #eff6ff; }
+  .btn-xs-del { background: white; color: #dc2626; border-color: #fca5a5; }
+  .btn-xs-del:hover { background: #fef2f2; }
+
+  /* 알림 토글 */
+  .notif-toggle { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+  .notif-toggle input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; }
+  .notif-toggle label { font-size: 13px; color: #374151; cursor: pointer; }
+  .notif-preview {
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    border-radius: 8px; padding: 10px 14px;
+    font-size: 12px; color: #6b7280; line-height: 1.5;
+  }
+  .notif-preview strong { color: #050505; }
+  .notif-note {
+    font-size: 11px; color: #9ca3af; margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* seed type radio */
+  .radio-group { display: flex; flex-direction: column; gap: 8px; }
+  .radio-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 8px;
+    cursor: pointer; transition: border-color 0.12s;
+  }
+  .radio-item:has(input:checked) { border-color: #050505; background: #fafafa; }
+  .radio-item input { cursor: pointer; }
+  .radio-item-label { font-size: 13px; font-weight: 600; color: #050505; }
+  .radio-item-desc { font-size: 11px; color: #6b7280; }
+
+  /* ── 토스트 ── */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #050505; color: white;
+    padding: 12px 20px; border-radius: 10px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap; z-index: 9999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* prototype label */
+  .proto-label {
+    position: fixed; bottom: 20px; right: 20px;
+    background: #050505; color: white;
+    font-size: 11px; font-weight: 600;
+    padding: 6px 12px; border-radius: 100px;
+    letter-spacing: 0.05em; z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<!-- GNB -->
+<header class="gnb">
+  <div class="gnb-left">
+    <div class="gnb-logo">AO</div>
+    <span class="gnb-title">AhhaOhho Admin</span>
+  </div>
+  <div class="gnb-right">
+    <span class="gnb-user">김하경님(관리자)</span>
+    <button class="btn-logout">로그아웃</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SNB -->
+  <aside class="snb">
+    <a class="snb-item" href="#" onclick="return false">
+      <span class="snb-icon"></span>챌린지 관리
+    </a>
+    <a class="snb-item" href="#" onclick="return false">
+      <span class="snb-icon"></span>고정 데이터 관리
+    </a>
+    <a class="snb-item" href="#" onclick="return false">
+      <span class="snb-icon"></span>보상 관리
+    </a>
+    <a class="snb-item" href="#" onclick="switchPage('projects', this); return false">
+      <span class="snb-icon"></span>프로젝트 관리
+    </a>
+    <a class="snb-item active" href="#" onclick="switchPage('cheomdan', this); return false">
+      <span class="snb-icon"></span>체험단 관리
+    </a>
+    <a class="snb-item" href="#" onclick="return false">
+      <span class="snb-icon"></span>사용자 관리
+    </a>
+    <a class="snb-item" href="#" onclick="return false">
+      <span class="snb-icon"></span>앱 설정 관리
+    </a>
+    <a class="snb-item" href="#" onclick="switchPage('inquiry', this); return false">
+      <span class="snb-icon"></span>문의 관리
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+  <!-- ── 체험단 관리 페이지 ── -->
+  <div id="page-cheomdan" class="page-wrap">
+    <div class="content">
+
+      <div class="page-header">
+        <h1 class="page-title">체험단 관리</h1>
+        <p class="page-desc">체험단 기수를 관리하고 참여자를 등록합니다.</p>
+      </div>
+
+      <!-- 탭 -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('cohort', this)">기수 관리</button>
+        <button class="tab-btn" onclick="switchTab('member', this)">참여자 관리</button>
+      </div>
+
+      <!-- ── 탭1: 기수 관리 ── -->
+      <div id="tab-cohort" class="tab-content active">
+
+        <!-- 통계 -->
+        <div class="stat-row" id="cohort-stats"></div>
+
+        <div class="toolbar">
+          <div class="toolbar-right">
+            <button class="btn-primary" onclick="openModal('modal-add-cohort')">+ 기수 추가</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>기수</th>
+                <th>운영 기간</th>
+                <th>참여 인원</th>
+                <th>탈락</th>
+                <th>상태</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="cohort-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── 탭2: 참여자 관리 ── -->
+      <div id="tab-member" class="tab-content">
+
+        <!-- 기수 버튼 필터 -->
+        <div class="cohort-filter-row" id="cohort-filter-row">
+          <button class="cohort-btn active" onclick="setCohortFilter('', this)">전체</button>
+          <button class="cohort-btn" onclick="setCohortFilter('1', this)">1기</button>
+          <button class="cohort-btn" onclick="setCohortFilter('2', this)">2기</button>
+        </div>
+
+        <div class="toolbar">
+          <select class="select-sm" id="filter-status" onchange="filterMembers()">
+            <option value="">전체 상태</option>
+            <option value="active">활성</option>
+            <option value="dropped">탈락</option>
+          </select>
+          <input class="input-search" type="text" placeholder="이름 · 닉네임 · 전화번호 검색" oninput="filterMembers()" id="search-input">
+          <div class="toolbar-right" style="display:flex;gap:8px">
+            <button class="btn-secondary" onclick="openModal('modal-csv-import')">CSV 일괄 추가</button>
+            <button class="btn-primary" onclick="openModal('modal-add-member')">+ 참여자 추가</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>이름</th>
+                <th>닉네임</th>
+                <th>전화번호</th>
+                <th>기수</th>
+                <th>상태</th>
+                <th>태깅일</th>
+                <th style="text-align:right">관리</th>
+              </tr>
+            </thead>
+            <tbody id="member-tbody">
+              <!-- JS로 렌더링 -->
+            </tbody>
+          </table>
+        </div>
+        <div id="member-empty" class="empty-state" style="display:none">검색 결과가 없습니다.</div>
+
+      </div>
+    </div>
+  </div><!-- /page-cheomdan -->
+
+  <!-- ── 프로젝트 관리 페이지 ── -->
+  <div id="page-projects" class="page-wrap" style="display:none">
+    <div class="content">
+
+      <div class="page-header">
+        <h1 class="page-title">프로젝트 관리</h1>
+        <p class="page-desc">게시물을 조회하고 시드 프로젝트를 지정합니다.</p>
+      </div>
+
+      <!-- 필터 -->
+      <div class="cohort-filter-row" style="margin-bottom:12px">
+        <button class="cohort-btn active" onclick="setPostType('', this)">전체</button>
+        <button class="cohort-btn" onclick="setPostType('challenge', this)">챌린지</button>
+        <button class="cohort-btn" onclick="setPostType('free', this)">자율게시</button>
+      </div>
+      <div class="toolbar" style="margin-bottom:20px">
+        <!-- 챌린지 선택 (챌린지 탭 선택 시에만 노출) -->
+        <select class="select-sm" id="challenge-filter" onchange="renderPosts()" style="display:none">
+          <option value="">전체 챌린지</option>
+          <option value="C001">나만의 악기 만들기</option>
+          <option value="C002">재활용 재료로 집 짓기</option>
+          <option value="C003">움직이는 장난감 만들기</option>
+          <option value="C004">바람으로 움직이는 것 만들기</option>
+          <option value="C005">물에 뜨는 배 만들기</option>
+        </select>
+        <select class="select-sm" id="post-sort" onchange="renderPosts()">
+          <option value="desc">최신순</option>
+          <option value="asc">오래된순</option>
+        </select>
+      </div>
+
+      <!-- 게시물 그리드 -->
+      <div class="post-grid" id="post-grid"></div>
+      <div id="post-empty" class="empty-state" style="display:none">게시물이 없습니다.</div>
+
+    </div>
+  </div><!-- /page-projects -->
+
+  <!-- ── 문의 관리 페이지 ── -->
+  <div id="page-inquiry" class="page-wrap" style="display:none">
+    <div class="content">
+
+      <div class="page-header">
+        <h1 class="page-title">문의 관리</h1>
+        <p class="page-desc">서비스 이용 문의를 확인하고 답변합니다.</p>
+      </div>
+
+      <!-- 요약 카드 -->
+      <div class="stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-label">미답변</div>
+          <div class="stat-value" id="inq-stat-pending" style="color:#dc2626"></div>
+          <div class="stat-sub">빠른 처리가 필요해요</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">처리중</div>
+          <div class="stat-value" id="inq-stat-progress"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">전체 문의</div>
+          <div class="stat-value" id="inq-stat-total"></div>
+        </div>
+      </div>
+
+      <!-- 필터 -->
+      <div class="toolbar" style="margin-bottom:16px">
+        <select class="select-sm" id="inq-type-filter" onchange="renderInquiries()">
+          <option value="">전체 유형</option>
+          <option value="앱 사용 방법">앱 사용 방법</option>
+          <option value="오류/문제 제보">오류/문제 제보</option>
+          <option value="하고 싶은 말">하고 싶은 말</option>
+          <option value="개인 정보 문의">개인 정보 문의</option>
+        </select>
+        <select class="select-sm" id="inq-status-filter" onchange="renderInquiries()">
+          <option value="">전체 상태</option>
+          <option value="접수">접수</option>
+          <option value="처리중">처리중</option>
+          <option value="완료">완료</option>
+        </select>
+        <input class="input-search" type="text" id="inq-search" placeholder="이름 · 제목 · 접수번호 검색" oninput="renderInquiries()" style="width:200px">
+      </div>
+
+      <!-- 테이블 -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>접수번호</th>
+              <th>접수일시</th>
+              <th>유형</th>
+              <th>제목</th>
+              <th>이름</th>
+              <th>답변방법</th>
+              <th>처리상태</th>
+              <th>담당자</th>
+              <th style="text-align:right">관리</th>
+            </tr>
+          </thead>
+          <tbody id="inq-tbody"></tbody>
+        </table>
+      </div>
+      <div id="inq-empty" class="empty-state" style="display:none">문의가 없습니다.</div>
+
+    </div>
+  </div><!-- /page-inquiry -->
+
+  </main>
+</div>
+
+<!-- ── 기수 추가 모달 ── -->
+<div class="modal-overlay" id="modal-add-cohort">
+  <div class="modal">
+    <div class="modal-title">기수 추가</div>
+    <div class="form-group">
+      <label class="form-label">기수 <span class="form-required">*</span></label>
+      <input class="form-input" type="number" placeholder="예: 3" min="1">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">시작일 <span class="form-required">*</span></label>
+        <input class="form-input" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">종료일 <span class="form-required">*</span></label>
+        <input class="form-input" type="date">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">메모</label>
+      <input class="form-input" type="text" placeholder="운영 관련 메모 (선택)">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-add-cohort')">취소</button>
+      <button class="btn-primary" onclick="saveCohort()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 기수 수정 모달 ── -->
+<div class="modal-overlay" id="modal-edit-cohort">
+  <div class="modal">
+    <div class="modal-title">기수 수정</div>
+    <div class="form-group">
+      <label class="form-label">기수</label>
+      <input class="form-input" type="number" value="1" disabled style="background:#f9fafb;color:#9ca3af">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">시작일 <span class="form-required">*</span></label>
+        <input class="form-input" type="date" value="2026-03-01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">종료일 <span class="form-required">*</span></label>
+        <input class="form-input" type="date" value="2026-04-26">
+      </div>
+    </div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-bottom:16px">
+      <div style="font-size:12px;color:#166534">✅ 상태는 운영 기간을 기준으로 자동 계산됩니다.</div>
+      <div style="font-size:11px;color:#15803d;margin-top:2px">운영 전 · 운영 중 · 종료</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">메모</label>
+      <input class="form-input" type="text" placeholder="운영 관련 메모 (선택)">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-edit-cohort')">취소</button>
+      <button class="btn-primary" onclick="closeModal('modal-edit-cohort')">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 참여자 추가 모달 ── -->
+<div class="modal-overlay" id="modal-add-member">
+  <div class="modal">
+    <div class="modal-title">참여자 추가</div>
+    <div class="form-group">
+      <label class="form-label">앱 유저 검색 <span class="form-required">*</span></label>
+      <input class="form-input" type="text" placeholder="닉네임 또는 전화번호 입력" oninput="searchUser(this.value)" id="user-search-input">
+      <p class="form-hint">2글자 이상 입력하면 검색됩니다</p>
+      <div class="search-results" id="search-results">
+        <div class="search-result-item" onclick="selectUser(this, '우주탐험가', '+821012345678')">
+          <span class="search-result-name">우주탐험가</span>
+          <span class="search-result-phone">+82 10-1234-5678</span>
+        </div>
+        <div class="search-result-item" onclick="selectUser(this, '별빛소년', '+821098765432')">
+          <span class="search-result-name">별빛소년</span>
+          <span class="search-result-phone">+82 10-9876-5432</span>
+        </div>
+        <div class="search-result-item" onclick="selectUser(this, '로켓제작자', '+821055554444')">
+          <span class="search-result-name">로켓제작자</span>
+          <span class="search-result-phone">+82 10-5555-4444</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group" id="selected-user-info" style="display:none">
+      <label class="form-label">선택된 유저</label>
+      <div style="padding:10px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;">
+        <span id="selected-name" style="font-weight:600"></span>
+        <span id="selected-phone" style="color:#9ca3af;margin-left:8px;font-size:12px"></span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">이름(실명) <span class="form-required">*</span></label>
+      <input class="form-input" type="text" id="input-realname" placeholder="예: 홍길동">
+      <p class="form-hint">아이의 실명을 입력하세요. 앱에는 표시되지 않습니다.</p>
+    </div>
+    <div class="form-group">
+      <label class="form-label">기수 <span class="form-required">*</span></label>
+      <select class="form-select">
+        <option value="">기수 선택</option>
+        <option value="1">1기</option>
+        <option value="2" selected>2기</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-add-member')">취소</button>
+      <button class="btn-primary" onclick="addMember()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CSV 일괄 추가 모달 ── -->
+<div class="modal-overlay" id="modal-csv-import">
+  <div class="modal" style="width:560px">
+    <div class="modal-title">CSV 일괄 추가</div>
+
+    <!-- CSV 형식 가이드 -->
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">📋 CSV 형식 가이드</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:10px">OT 이후 확정된 명단 기준으로 작성하세요. 전화번호로 앱 계정을 자동 조회해 이름·닉네임을 연결합니다.</div>
+      <div style="background:white;border:1px solid #e5e7eb;border-radius:6px;padding:10px 14px;font-family:monospace;font-size:12px;color:#050505;line-height:1.8">
+        전화번호,기수<br>
+        +821012345678,2<br>
+        +821098765432,2
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:11px;color:#6b7280">• <strong>전화번호</strong>: 국제번호 포함 (예: +821012345678) (필수)</div>
+        <div style="font-size:11px;color:#6b7280">• <strong>기수</strong>: 숫자만 입력 (예: 1, 2, 3) (필수)</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:2px">※ 이름·닉네임은 전화번호로 앱 계정을 자동 조회해 연결됩니다. 계정이 없거나 번호가 다를 경우 "계정 미확인"으로 표시됩니다.</div>
+      </div>
+    </div>
+
+    <!-- 중복 안내 -->
+    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:12px 14px;margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:4px">⚠️ 중복 처리 안내</div>
+      <div style="font-size:12px;color:#78350f;line-height:1.6">
+        전화번호가 동일한 참여자가 이미 등록되어 있을 경우 <strong>이름, 닉네임, 기수 정보가 덮어씌워집니다.</strong><br>
+        Amplitude에 이미 수집된 이벤트 데이터에는 영향이 없으며, user property(is_tester, tester_cohort)만 현재 값으로 업데이트됩니다.
+      </div>
+    </div>
+
+    <!-- 파일 업로드 -->
+    <div class="form-group">
+      <label class="form-label">CSV 파일 선택 <span class="form-required">*</span></label>
+      <div id="csv-drop-zone" style="border:2px dashed #d1d5db;border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:border-color 0.15s"
+           onclick="document.getElementById('csv-file-input').click()"
+           ondragover="event.preventDefault();this.style.borderColor='#050505'"
+           ondragleave="this.style.borderColor='#d1d5db'"
+           ondrop="handleCsvDrop(event)">
+        <div style="font-size:24px;margin-bottom:8px">📂</div>
+        <div style="font-size:13px;font-weight:600;color:#374151">클릭하거나 파일을 드래그하세요</div>
+        <div style="font-size:12px;color:#9ca3af;margin-top:4px">.csv 파일만 지원</div>
+        <input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="handleCsvFile(this)">
+      </div>
+    </div>
+
+    <!-- 파싱 결과 미리보기 -->
+    <div id="csv-preview" style="display:none">
+      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">
+        미리보기 <span id="csv-count" style="color:#6b7280;font-weight:400"></span>
+      </div>
+      <div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;max-height:180px;overflow-y:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:#f9fafb;border-bottom:1px solid #e5e7eb">
+              <th style="padding:8px 12px;text-align:left;color:#6b7280;font-weight:600">전화번호</th>
+              <th style="padding:8px 12px;text-align:left;color:#6b7280;font-weight:600">이름 (자동)</th>
+              <th style="padding:8px 12px;text-align:left;color:#6b7280;font-weight:600">닉네임 (자동)</th>
+              <th style="padding:8px 12px;text-align:left;color:#6b7280;font-weight:600">기수</th>
+              <th style="padding:8px 12px;text-align:left;color:#6b7280;font-weight:600">처리</th>
+            </tr>
+          </thead>
+          <tbody id="csv-preview-tbody"></tbody>
+        </table>
+      </div>
+      <div id="csv-error" style="display:none;margin-top:8px;font-size:12px;color:#dc2626"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeCsvModal()">취소</button>
+      <button class="btn-primary" id="csv-import-btn" onclick="importCsv()" disabled style="opacity:0.4">가져오기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 탈락 처리 확인 모달 ── -->
+<div class="modal-overlay" id="modal-drop-confirm">
+  <div class="modal modal-sm">
+    <div class="modal-title">탈락 처리</div>
+    <p class="modal-desc">
+      <strong id="drop-target-name"></strong>님을 탈락 처리하시겠습니까?<br>
+      <span style="color:#dc2626">체험단 배지가 제거되며 되돌릴 수 없습니다.</span>
+    </p>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-drop-confirm')">취소</button>
+      <button class="btn-primary" style="background:#dc2626" onclick="confirmDrop()">탈락 처리</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 시드 지정 모달 ── -->
+<div class="modal-overlay" id="modal-seed">
+  <div class="modal">
+    <div class="modal-title">시드 프로젝트 지정</div>
+    <div id="seed-post-info" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin-bottom:20px;font-size:13px">
+      <div id="seed-post-title" style="font-weight:700;color:#050505"></div>
+      <div id="seed-post-meta" style="color:#9ca3af;margin-top:2px;font-size:12px"></div>
+    </div>
+    <!-- 자동 결정된 시드 유형 안내 -->
+    <div id="seed-type-info" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#166534"></div>
+
+    <!-- 챌린지 게시물인 경우: 챌린지 확인 -->
+    <div class="form-group" id="challenge-select-wrap" style="display:none">
+      <label class="form-label">챌린지 확인 <span class="form-required">*</span></label>
+      <select class="form-select" id="seed-challenge-select">
+        <option value="">챌린지를 선택하세요</option>
+        <option value="C001">나만의 악기 만들기</option>
+        <option value="C002">재활용 재료로 집 짓기</option>
+        <option value="C003">움직이는 장난감 만들기</option>
+        <option value="C004">바람으로 움직이는 것 만들기</option>
+        <option value="C005">물에 뜨는 배 만들기</option>
+      </select>
+    </div>
+    <div class="notif-toggle">
+      <input type="checkbox" id="seed-notif" checked>
+      <label for="seed-notif">선정 인앱 알림 발송</label>
+    </div>
+    <div class="notif-preview">
+      <strong>📬 알림 미리보기</strong><br>
+      "🌱 축하해요! 회원님의 작품이 시드 프로젝트로 선정되었어요."
+      <div class="notif-note">※ 알림 문구 상세는 화면 기획서 작성 예정</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-seed')">취소</button>
+      <button class="btn-primary" onclick="confirmSeed()">지정하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 숨김 처리 모달 ── -->
+<div class="modal-overlay" id="modal-hide">
+  <div class="modal">
+    <div class="modal-title">게시물 숨김 처리</div>
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin-bottom:20px;font-size:13px">
+      <div id="hide-post-title" style="font-weight:700;color:#050505"></div>
+      <div id="hide-post-meta" style="color:#9ca3af;margin-top:2px;font-size:12px"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">처리 사유 <span class="form-required">*</span></label>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="radio" name="hide-reason" value="inappropriate" checked> 부적절한 콘텐츠
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="radio" name="hide-reason" value="copyright"> 저작권 위반
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="radio" name="hide-reason" value="spam"> 스팸/광고
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="radio" name="hide-reason" value="etc"> 기타
+        </label>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="notif-toggle">
+        <input type="checkbox" id="hide-notif" checked>
+        <label for="hide-notif">인앱 알림 발송</label>
+      </div>
+      <div class="notif-preview">
+        <strong>📬 알림 미리보기</strong><br>
+        "회원님의 게시물이 운영 정책에 따라 숨김 처리되었습니다."
+        <div class="notif-note">※ 알림 문구 상세는 화면 기획서 작성 예정</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-hide')">취소</button>
+      <button class="btn-primary" style="background:#374151" onclick="confirmHide('hide')">숨김 처리</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 노출 전환 모달 ── -->
+<div class="modal-overlay" id="modal-show">
+  <div class="modal modal-sm">
+    <div class="modal-title">게시물 노출 전환</div>
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin-bottom:20px;font-size:13px">
+      <div id="show-post-title" style="font-weight:700;color:#050505"></div>
+      <div id="show-post-meta" style="color:#9ca3af;margin-top:2px;font-size:12px"></div>
+    </div>
+    <p style="font-size:13px;color:#374151;margin-bottom:16px">숨김 처리된 게시물을 다시 노출합니다.</p>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-show')">취소</button>
+      <button class="btn-primary" style="background:#1d4ed8" onclick="confirmHide('show')">노출 전환</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 삭제 모달 ── -->
+<div class="modal-overlay" id="modal-del-post">
+  <div class="modal modal-sm">
+    <div class="modal-title">게시물 삭제</div>
+    <div id="del-post-info" style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px">
+      <div id="del-post-title" style="font-weight:700;color:#050505"></div>
+      <div id="del-post-meta" style="color:#9ca3af;margin-top:2px;font-size:12px"></div>
+    </div>
+    <p style="font-size:13px;color:#dc2626;margin-bottom:16px">이 작업은 되돌릴 수 없습니다.</p>
+    <div class="notif-toggle">
+      <input type="checkbox" id="del-notif" checked>
+      <label for="del-notif">인앱 알림 발송</label>
+    </div>
+    <div class="notif-preview">
+      <strong>📬 알림 미리보기</strong><br>
+      "회원님의 게시물이 운영 정책에 따라 삭제 처리되었습니다."
+      <div class="notif-note">※ 알림 문구 상세는 화면 기획서 작성 예정</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-del-post')">취소</button>
+      <button class="btn-primary" style="background:#dc2626" onclick="confirmDeletePost()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 문의 상세 모달 ── -->
+<div class="modal-overlay" id="modal-inquiry-detail">
+  <div class="modal" style="width:560px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div class="modal-title" style="margin-bottom:0" id="inq-detail-title"></div>
+      <span id="inq-detail-status-badge"></span>
+    </div>
+
+    <!-- 문의 정보 -->
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+        <div><span style="color:#9ca3af">접수번호</span><br><strong id="inq-d-num"></strong></div>
+        <div><span style="color:#9ca3af">접수일시</span><br><span id="inq-d-date"></span></div>
+        <div><span style="color:#9ca3af">이름</span><br><span id="inq-d-name"></span></div>
+        <div><span style="color:#9ca3af">연락처</span><br><span id="inq-d-contact"></span></div>
+        <div><span style="color:#9ca3af">문의유형</span><br><span id="inq-d-type"></span></div>
+        <div><span style="color:#9ca3af">답변방법</span><br><span id="inq-d-method"></span></div>
+      </div>
+    </div>
+
+    <!-- 문의 내용 -->
+    <div class="form-group">
+      <label class="form-label">문의 내용</label>
+      <div id="inq-d-content" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;font-size:13px;color:#374151;line-height:1.6;min-height:80px;white-space:pre-wrap"></div>
+    </div>
+
+    <!-- 기존 답변 (완료된 경우) -->
+    <div id="inq-d-prev-answer-wrap" style="display:none">
+      <div class="form-group">
+        <label class="form-label">답변 내용</label>
+        <div id="inq-d-prev-answer" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap"></div>
+        <div id="inq-d-answer-meta" style="font-size:11px;color:#9ca3af;margin-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- 정책 정보 (유형별 자동) -->
+    <div id="inq-d-policy-info" style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px"></div>
+
+    <!-- 답변 작성 (미완료인 경우) -->
+    <div id="inq-d-answer-form" style="display:none">
+      <div class="form-group">
+        <label class="form-label" id="inq-answer-label">답변 작성</label>
+        <textarea class="form-input" id="inq-answer-input" rows="4" placeholder="답변 내용을 입력하세요" style="resize:vertical;height:100px"></textarea>
+      </div>
+
+      <!-- 알림톡 미리보기 -->
+      <div id="inq-alimtalk-preview-wrap" style="display:none;margin-bottom:16px">
+        <div class="form-label" style="margin-bottom:6px">📬 알림톡 미리보기</div>
+        <div class="notif-preview" id="inq-alimtalk-preview"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">담당자</label>
+        <input class="form-input" type="text" id="inq-handler-input" placeholder="담당자 이름" value="김하경">
+      </div>
+      <div class="form-group">
+        <label class="form-label">처리상태</label>
+        <select class="form-select" id="inq-status-input">
+          <option value="처리중">처리중</option>
+          <option value="완료">완료</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 답변 없이 종결 (선택 유형) -->
+    <div id="inq-d-close-wrap" style="display:none;margin-bottom:16px">
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;font-size:13px;color:#6b7280">
+        이 유형은 답변 없이 종결 처리할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-inquiry-detail')">닫기</button>
+      <button class="btn-secondary" id="inq-close-btn" onclick="closeInquiry()" style="display:none">답변 없이 종결</button>
+      <button class="btn-primary" id="inq-save-btn" onclick="saveInquiryAnswer()" style="display:none">알림톡 발송 후 저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="proto-label">프로토타입</div>
+
+<script>
+/* ── 기수 데이터 ── */
+const cohorts = [
+  { num: 1, start: '2026-03-01', end: '2026-07-30', total: 34, dropped: 6 },
+  { num: 2, start: '2026-06-10', end: '2026-10-04', total: 40, dropped: 0 },
+];
+
+function getCohortStatus(start, end) {
+  const today = new Date();
+  const s = new Date(start);
+  const e = new Date(end);
+  if (today < s) return { label: '운영 전',  cls: 'badge-pending'  };
+  if (today > e) return { label: '종료',     cls: 'badge-ended'    };
+  return            { label: '운영 중',  cls: 'badge-running'  };
+}
+
+function renderCohorts() {
+  // 테이블
+  const tbody = document.getElementById('cohort-tbody');
+  tbody.innerHTML = cohorts.map(c => {
+    const st = getCohortStatus(c.start, c.end);
+    const startFmt = c.start.replaceAll('-', '.');
+    const endFmt   = c.end.replaceAll('-', '.');
+    return `
+      <tr>
+        <td><strong>${c.num}기</strong></td>
+        <td>${startFmt} ~ ${endFmt}</td>
+        <td>${c.total}명</td>
+        <td>${c.dropped}명</td>
+        <td><span class="badge ${st.cls}">${st.label}</span></td>
+        <td><button class="btn-secondary" onclick="openModal('modal-edit-cohort')">수정</button></td>
+      </tr>`;
+  }).join('');
+
+  // 통계 카드
+  const running = cohorts.filter(c => getCohortStatus(c.start, c.end).label === '운영 중');
+  const totalMembers = cohorts.reduce((s, c) => s + c.total, 0);
+  const totalDropped = cohorts.reduce((s, c) => s + c.dropped, 0);
+
+  const runningCard = running.length === 0
+    ? `<div class="stat-card">
+        <div class="stat-label">현재 운영 중인 기수</div>
+        <div class="stat-value" style="font-size:18px;color:#9ca3af">없음</div>
+       </div>`
+    : `<div class="stat-card">
+        <div class="stat-label">현재 운영 중인 기수</div>
+        <div style="display:flex;align-items:center;gap:8px;margin:6px 0 4px">
+          <div class="stat-value">${running.length}개</div>
+          <span class="badge badge-running">운영 중</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px">
+          ${running.map(c => `
+            <div style="font-size:12px;color:#374151;display:flex;align-items:center;gap:6px">
+              <span style="font-weight:700">${c.num}기</span>
+              <span style="color:#9ca3af">${c.start.replaceAll('-','.')} ~ ${c.end.replaceAll('-','.')}</span>
+            </div>`).join('')}
+        </div>
+       </div>`;
+
+  document.getElementById('cohort-stats').innerHTML = `
+    ${runningCard}
+    <div class="stat-card">
+      <div class="stat-label">전체 참여자</div>
+      <div class="stat-value">${totalMembers}</div>
+      <div class="stat-sub">탈락 ${totalDropped}명 제외 시 ${totalMembers - totalDropped}명</div>
+    </div>
+  `;
+}
+
+/* ── 목업 데이터 ── */
+let members = [
+  { id: 1, name: '이희준', nickname: '우주탐험가',  phone: '+82 10-1111-2222', cohort: 2, status: 'active',  taggedAt: '2026.06.10' },
+  { id: 2, name: '김지민', nickname: '별빛소년',    phone: '+82 10-3333-4444', cohort: 2, status: 'active',  taggedAt: '2026.06.10' },
+  { id: 3, name: '박서연', nickname: '로켓제작자',  phone: '+82 10-5555-6666', cohort: 2, status: 'active',  taggedAt: '2026.06.10' },
+  { id: 4, name: '최민준', nickname: '달나라친구',  phone: '+82 10-7777-8888', cohort: 2, status: 'active',  taggedAt: '2026.06.11' },
+  { id: 5, name: '정수아', nickname: '행성탐험대',  phone: '+82 10-9999-0000', cohort: 2, status: 'active',  taggedAt: '2026.06.11' },
+  { id: 6, name: '윤태양', nickname: '은하수메이커', phone: '+82 10-1234-5678', cohort: 1, status: 'active',  taggedAt: '2026.03.01' },
+  { id: 7, name: '강하늘', nickname: '태양계탐험',  phone: '+82 10-8765-4321', cohort: 1, status: 'dropped', taggedAt: '2026.03.01' },
+  { id: 8, name: '임소율', nickname: '혜성관찰자',  phone: '+82 10-2468-1357', cohort: 2, status: 'active',  taggedAt: '2026.06.12' },
+];
+
+let dropTargetId = null;
+let selectedUser = null;
+let activeCohortFilter = '';
+
+/* ── 탭 전환 ── */
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+  if (tabId === 'member') renderMembers(members);
+}
+
+/* ── 참여자 렌더링 ── */
+function renderMembers(data) {
+  const tbody = document.getElementById('member-tbody');
+  const empty = document.getElementById('member-empty');
+  if (data.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = data.map(m => `
+    <tr id="row-${m.id}">
+      <td><strong>${m.name}</strong></td>
+      <td style="color:#6b7280">${m.nickname}</td>
+      <td style="color:#6b7280">${m.phone}</td>
+      <td>${m.cohort}기</td>
+      <td><span class="badge badge-${m.status}">${m.status === 'active' ? '활성' : '탈락'}</span></td>
+      <td style="color:#9ca3af">${m.taggedAt}</td>
+      <td style="text-align:right">
+        ${m.status === 'active'
+          ? `<button class="btn-danger" onclick="openDropConfirm(${m.id}, '${m.name}')">탈락 처리</button>`
+          : `<span style="font-size:12px;color:#9ca3af">처리 완료</span>`
+        }
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ── 기수 버튼 필터 ── */
+function setCohortFilter(val, btn) {
+  activeCohortFilter = val;
+  document.querySelectorAll('.cohort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterMembers();
+}
+
+/* ── 필터링 ── */
+function filterMembers() {
+  const status = document.getElementById('filter-status').value;
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = members.filter(m => {
+    const matchCohort = !activeCohortFilter || String(m.cohort) === activeCohortFilter;
+    const matchStatus = !status || m.status === status;
+    const matchQ = !q || m.name.toLowerCase().includes(q) || m.nickname.toLowerCase().includes(q) || m.phone.includes(q);
+    return matchCohort && matchStatus && matchQ;
+  });
+  renderMembers(filtered);
+}
+
+/* ── 유저 검색 (모달) ── */
+function searchUser(val) {
+  const results = document.getElementById('search-results');
+  if (val.length >= 2) {
+    results.classList.add('show');
+  } else {
+    results.classList.remove('show');
+    document.getElementById('selected-user-info').style.display = 'none';
+    selectedUser = null;
+  }
+}
+
+function selectUser(el, name, phone) {
+  document.querySelectorAll('.search-result-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedUser = { name, phone };
+  document.getElementById('user-search-input').value = name;
+  document.getElementById('search-results').classList.remove('show');
+  document.getElementById('selected-name').textContent = name;
+  document.getElementById('selected-phone').textContent = phone;
+  document.getElementById('selected-user-info').style.display = 'block';
+}
+
+/* ── 참여자 추가 ── */
+function addMember() {
+  if (!selectedUser) { alert('유저를 선택해주세요.'); return; }
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+  const realName = document.getElementById('input-realname').value.trim() || '(미입력)';
+  members.push({
+    id: Date.now(),
+    name: realName,
+    nickname: selectedUser.name,
+    phone: selectedUser.phone,
+    cohort: 2,
+    status: 'active',
+    taggedAt: dateStr,
+  });
+  closeModal('modal-add-member');
+  selectedUser = null;
+  document.getElementById('user-search-input').value = '';
+  document.getElementById('input-realname').value = '';
+  document.getElementById('selected-user-info').style.display = 'none';
+  filterMembers();
+}
+
+/* ── 탈락 처리 ── */
+function openDropConfirm(id, name) {
+  dropTargetId = id;
+  document.getElementById('drop-target-name').textContent = name;
+  openModal('modal-drop-confirm');
+}
+
+function confirmDrop() {
+  if (!dropTargetId) return;
+  const m = members.find(m => m.id === dropTargetId);
+  if (m) m.status = 'dropped';
+  closeModal('modal-drop-confirm');
+  dropTargetId = null;
+  filterMembers();
+}
+
+/* ── 기수 추가 ── */
+function saveCohort() {
+  closeModal('modal-add-cohort');
+  alert('기수가 추가되었습니다. (프로토타입)');
+}
+
+/* ── 모달 ── */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+/* ── CSV 관련 ── */
+let parsedCsvRows = [];
+
+function handleCsvDrop(e) {
+  e.preventDefault();
+  document.getElementById('csv-drop-zone').style.borderColor = '#d1d5db';
+  const file = e.dataTransfer.files[0];
+  if (file) parseCsvFile(file);
+}
+
+function handleCsvFile(input) {
+  const file = input.files[0];
+  if (file) parseCsvFile(file);
+}
+
+function parseCsvFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    const lines = text.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2) {
+      showCsvError('데이터가 없습니다. 헤더 포함 2행 이상 필요합니다.');
+      return;
+    }
+    // 앱 계정 목업 (실제로는 서버에서 전화번호로 조회)
+    const appAccounts = {
+      '+821012345678': { name: '홍길동', nickname: '우주탐험가' },
+      '+821098765432': { name: '김영희', nickname: '별빛소년' },
+      '+821055554444': { name: '이민준', nickname: '로켓제작자' },
+      '+821011112222': { name: '박소연', nickname: '달나라친구' },
+    };
+    const rows = [];
+    const errors = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',').map(c => c.trim());
+      if (cols.length < 2) { errors.push(`${i+1}행: 컬럼 수 부족`); continue; }
+      const [phone, cohortStr] = cols;
+      const cohort = parseInt(cohortStr);
+      if (!phone) { errors.push(`${i+1}행: 전화번호 누락`); continue; }
+      if (isNaN(cohort)) { errors.push(`${i+1}행: 기수가 숫자가 아님`); continue; }
+      const account = appAccounts[phone] || null;
+      const isDuplicate = members.some(m => m.phone === phone);
+      rows.push({
+        name: account?.name || null,
+        nickname: account?.nickname || null,
+        phone, cohort, isDuplicate
+      });
+    }
+    parsedCsvRows = rows;
+    renderCsvPreview(rows, errors);
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function renderCsvPreview(rows, errors) {
+  const preview = document.getElementById('csv-preview');
+  const tbody = document.getElementById('csv-preview-tbody');
+  const countEl = document.getElementById('csv-count');
+  const errorEl = document.getElementById('csv-error');
+  const importBtn = document.getElementById('csv-import-btn');
+
+  preview.style.display = 'block';
+  const dupCount = rows.filter(r => r.isDuplicate).length;
+  const unconfirmed = rows.filter(r => !r.nickname).length;
+  let countText = `총 ${rows.length}명 (신규 ${rows.length - dupCount}명 · 덮어쓰기 ${dupCount}명)`;
+  if (unconfirmed > 0) countText += ` · ⚠️ 계정 미확인 ${unconfirmed}명`;
+  countEl.textContent = countText;
+
+  const unmatched = r => !r.name || !r.nickname;
+  tbody.innerHTML = rows.map(r => `
+    <tr style="border-bottom:1px solid #f3f4f6;background:${unmatched(r) ? '#fffbeb' : 'white'}">
+      <td style="padding:8px 12px;color:#6b7280">${r.phone}</td>
+      <td style="padding:8px 12px">
+        ${r.name
+          ? `<span style="font-weight:600">${r.name}</span>`
+          : `<span style="font-size:11px;font-weight:600;color:#d97706;background:#fef3c7;padding:2px 7px;border-radius:100px">미확인</span>`}
+      </td>
+      <td style="padding:8px 12px">
+        ${r.nickname
+          ? `<span style="color:#6b7280">${r.nickname}</span>`
+          : `<span style="font-size:11px;font-weight:600;color:#d97706;background:#fef3c7;padding:2px 7px;border-radius:100px">미확인</span>`}
+      </td>
+      <td style="padding:8px 12px">${r.cohort}기</td>
+      <td style="padding:8px 12px">
+        ${r.isDuplicate
+          ? '<span style="font-size:11px;font-weight:600;color:#d97706;background:#fef3c7;padding:2px 7px;border-radius:100px">덮어쓰기</span>'
+          : '<span style="font-size:11px;font-weight:600;color:#166534;background:#dcfce7;padding:2px 7px;border-radius:100px">신규</span>'}
+      </td>
+    </tr>
+  `).join('');
+
+  if (errors.length > 0) {
+    errorEl.style.display = 'block';
+    errorEl.textContent = '오류: ' + errors.join(' / ');
+  } else {
+    errorEl.style.display = 'none';
+  }
+
+  if (rows.length > 0) {
+    importBtn.disabled = false;
+    importBtn.style.opacity = '1';
+  }
+}
+
+function importCsv() {
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+  let newCount = 0, overCount = 0;
+
+  parsedCsvRows.forEach(row => {
+    const existing = members.find(m => m.phone === row.phone);
+    if (existing) {
+      if (row.name) existing.name = row.name;
+      if (row.nickname) existing.nickname = row.nickname;
+      existing.cohort = row.cohort;
+      overCount++;
+    } else {
+      members.push({
+        id: Date.now() + Math.random(),
+        name: row.name || '(계정 미확인)',
+        nickname: row.nickname || '(계정 미확인)',
+        phone: row.phone,
+        cohort: row.cohort,
+        status: 'active',
+        taggedAt: dateStr
+      });
+      newCount++;
+    }
+  });
+
+  closeCsvModal();
+  filterMembers();
+  alert(`가져오기 완료\n신규 추가: ${newCount}명\n덮어쓰기: ${overCount}명`);
+}
+
+function closeCsvModal() {
+  closeModal('modal-csv-import');
+  parsedCsvRows = [];
+  document.getElementById('csv-preview').style.display = 'none';
+  document.getElementById('csv-file-input').value = '';
+  document.getElementById('csv-import-btn').disabled = true;
+  document.getElementById('csv-import-btn').style.opacity = '0.4';
+}
+
+function showCsvError(msg) {
+  document.getElementById('csv-preview').style.display = 'block';
+  document.getElementById('csv-preview-tbody').innerHTML = '';
+  document.getElementById('csv-count').textContent = '';
+  document.getElementById('csv-error').style.display = 'block';
+  document.getElementById('csv-error').textContent = msg;
+}
+
+// 모달 바깥 클릭 시 닫기
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+/* ── 토스트 ── */
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* ── 페이지 전환 ── */
+function switchPage(pageId, el) {
+  document.querySelectorAll('.page-wrap').forEach(p => p.style.display = 'none');
+  document.getElementById('page-' + pageId).style.display = 'block';
+  document.querySelectorAll('.snb-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── 프로젝트 관리 데이터 ── */
+let posts = [
+  { id:'P001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',  author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal',  seedType:null,        bg:'#e0f2fe', emoji:'🎸' },
+  { id:'P002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',  authorName:'김지민', date:'2026.06.13', status:'normal',  seedType:'challenge',  bg:'#fef3c7', emoji:'🏠' },
+  { id:'P003', type:'free',      challengeId:null,   challenge:null,                 author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden',  seedType:null,        bg:'#fce7f3', emoji:'🚀' },
+  { id:'P004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal',  seedType:null,        bg:'#d1fae5', emoji:'🤖' },
+  { id:'P005', type:'free',      challengeId:null,   challenge:null,                 author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal',  seedType:'idea',      bg:'#ede9fe', emoji:'🌈' },
+  { id:'P006', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal',  seedType:null,        bg:'#fff7ed', emoji:'🪁' },
+  { id:'P008', type:'free',      challengeId:null,   challenge:null,                 author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal',  seedType:null,        bg:'#fdf4ff', emoji:'🌸' },
+];
+
+let postTypeFilter = '';
+let targetPostId = null;
+
+function setPostType(val, btn) {
+  postTypeFilter = val;
+  document.querySelectorAll('#page-projects .cohort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // 챌린지 탭일 때만 챌린지 필터 노출
+  document.getElementById('challenge-filter').style.display = val === 'challenge' ? 'inline-block' : 'none';
+  document.getElementById('challenge-filter').value = '';
+  renderPosts();
+}
+
+function renderPosts() {
+  const sort      = document.getElementById('post-sort').value;
+  const challenge = document.getElementById('challenge-filter').value;
+
+  let data = [...posts];
+  if (postTypeFilter) data = data.filter(p => p.type === postTypeFilter);
+  if (challenge) data = data.filter(p => p.challengeId === challenge);
+  data.sort((a, b) => sort === 'desc' ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date));
+
+  const grid = document.getElementById('post-grid');
+  const empty = document.getElementById('post-empty');
+  if (!data.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  grid.innerHTML = data.map(p => {
+    const typeBadge = p.type === 'challenge'
+      ? `<span class="badge" style="background:#dbeafe;color:#1e40af;font-size:10px">챌린지</span>`
+      : `<span class="badge" style="background:#ede9fe;color:#6d28d9;font-size:10px">자율게시</span>`;
+    const seedBadge = p.seedType
+      ? `<div class="post-seed-badge seed-challenge">🌱 시드</div>`
+      : '';
+    const overlay = p.status === 'hidden'
+      ? `<div class="post-thumb-overlay">숨겨짐</div>`
+      : '';
+    const cardCls = p.status === 'hidden' ? 'post-card is-hidden' : 'post-card';
+    const hideBtn = p.status === 'hidden'
+      ? `<button class="btn-xs btn-xs-show" onclick="openHideModal('${p.id}', 'show')">노출</button>`
+      : `<button class="btn-xs btn-xs-hide" onclick="openHideModal('${p.id}', 'hide')">숨김</button>`;
+    const delBtn = `<button class="btn-xs btn-xs-del" onclick="openDeletePostModal('${p.id}')">삭제</button>`;
+    const seedBtn = p.status === 'hidden' ? '' : p.seedType
+      ? `<button class="btn-xs" style="background:white;color:#166534;border:1px solid #86efac" onclick="unseed('${p.id}')">시드 해제</button>`
+      : `<button class="btn-xs btn-xs-seed" onclick="openSeedModal('${p.id}')">시드 지정</button>`;
+
+    return `
+      <div class="${cardCls}">
+        <div class="post-thumb" style="background:${p.bg}">
+          <span>${p.emoji}</span>
+          <div class="post-badges">${typeBadge}</div>
+          ${overlay}
+        </div>
+        <div class="post-body">
+          ${p.challenge ? `<div class="post-challenge">${p.challenge}</div>` : '<div class="post-challenge" style="color:#9ca3af">자율게시</div>'}
+          <div class="post-author">${p.author}</div>
+          <div class="post-date">${p.date} · ID: ${p.id}</div>
+          ${seedBadge}
+        </div>
+        <div class="post-actions">${seedBtn}${hideBtn}${delBtn}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ── 시드 지정 ── */
+function openSeedModal(postId) {
+  targetPostId = postId;
+  const p = posts.find(x => x.id === postId);
+  document.getElementById('seed-post-title').textContent = p.challenge || '자율게시';
+  document.getElementById('seed-post-meta').textContent = `${p.authorName} @${p.author} · ${p.date}`;
+
+  const wrap = document.getElementById('challenge-select-wrap');
+  const typeInfo = document.getElementById('seed-type-info');
+
+  if (p.type === 'challenge') {
+    typeInfo.textContent = '🌱 챌린지 게시물이므로 챌린지 시드로 지정됩니다.';
+    wrap.style.display = 'block';
+    // 현재 챌린지 미리 선택
+    const sel = document.getElementById('seed-challenge-select');
+    sel.value = p.challengeId || '';
+  } else {
+    typeInfo.textContent = '🌱 자율 게시물이므로 자율 게시 시드로 지정됩니다.';
+    wrap.style.display = 'none';
+  }
+  openModal('modal-seed');
+}
+function toggleChallengeSelect() {} // 더 이상 사용 안 함
+function confirmSeed() {
+  const p = posts.find(x => x.id === targetPostId);
+  if (!p) return;
+  if (p.type === 'challenge' && !document.getElementById('seed-challenge-select').value) {
+    alert('챌린지를 선택하세요.'); return;
+  }
+  p.seedType = p.type === 'challenge' ? 'challenge' : 'free';
+  closeModal('modal-seed');
+  renderPosts();
+  showToast('🌱 시드 프로젝트로 지정했어요');
+}
+
+/* ── 숨김/노출 ── */
+function openHideModal(postId, action) {
+  targetPostId = postId;
+  const p = posts.find(x => x.id === postId);
+  if (action === 'hide') {
+    document.getElementById('hide-post-title').textContent = p.challenge || '자율게시';
+    document.getElementById('hide-post-meta').textContent = `${p.authorName} @${p.author} · ${p.date}`;
+    openModal('modal-hide');
+  } else {
+    document.getElementById('show-post-title').textContent = p.challenge || '자율게시';
+    document.getElementById('show-post-meta').textContent = `${p.authorName} @${p.author} · ${p.date}`;
+    openModal('modal-show');
+  }
+}
+function confirmHide(action) {
+  const p = posts.find(x => x.id === targetPostId);
+  if (p) p.status = action === 'hide' ? 'hidden' : 'normal';
+  closeModal('modal-hide');
+  closeModal('modal-show');
+  renderPosts();
+  showToast(action === 'hide' ? '게시물을 숨겼어요' : '게시물을 다시 노출했어요');
+}
+
+/* ── 삭제 ── */
+function openDeletePostModal(postId) {
+  targetPostId = postId;
+  const p = posts.find(x => x.id === postId);
+  document.getElementById('del-post-title').textContent = p.challenge || '자율게시';
+  document.getElementById('del-post-meta').textContent = `${p.authorName} @${p.author} · ${p.date}`;
+  openModal('modal-del-post');
+}
+function confirmDeletePost() {
+  posts = posts.filter(x => x.id !== targetPostId);
+  closeModal('modal-del-post');
+  renderPosts();
+  showToast('게시물을 삭제했어요');
+}
+
+function unseed(postId) {
+  const p = posts.find(x => x.id === postId);
+  if (p) p.seedType = null;
+  renderPosts();
+  showToast('시드 지정을 해제했어요');
+}
+
+/* ── 문의 데이터 ── */
+// 유형별 정책
+const INQ_POLICY = {
+  '앱 사용 방법':   { answerRequired: true,  sla: true,  label: '답변 필수' },
+  '오류/문제 제보': { answerRequired: false, sla: false, label: '답변 선택' },
+  '하고 싶은 말':   { answerRequired: false, sla: false, label: '답변 선택' },
+  '개인 정보 문의': { answerRequired: true,  sla: true,  label: '답변 필수' },
+};
+
+// 영업일 n일 후 날짜 계산
+function addBusinessDays(dateStr, days) {
+  const parts = dateStr.split(/[. :]/);
+  let d = new Date(parts[0], parts[1]-1, parts[2]);
+  let count = 0;
+  while (count < days) {
+    d.setDate(d.getDate() + 1);
+    if (d.getDay() !== 0 && d.getDay() !== 6) count++;
+  }
+  return `${d.getMonth()+1}월 ${d.getDate()}일`;
+}
+
+let inquiries = [
+  { id:'INQ-001', date:'2026.06.01 10:22', title:'앱 사용 방법을 잘 모르겠어요', type:'앱 사용 방법', name:'홍길동', contact:'010-1234-5678', method:'카카오 알림톡', content:'챌린지를 어떻게 시작하는지 잘 모르겠어요. 아이가 처음 써보는 거라 어려워하는 것 같아요.', status:'완료', answer:'안녕하세요! 챌린지는 홈 화면에서 원하는 챌린지를 선택한 뒤 시작하기 버튼을 누르면 됩니다.', answerDate:'2026.06.02 09:30', handler:'김하경' },
+  { id:'INQ-002', date:'2026.06.03 14:05', title:'사진 업로드가 계속 실패해요', type:'오류/문제 제보', name:'이영희', contact:'010-2345-6789', method:'카카오 알림톡', content:'게시물에 사진을 올리려고 하면 계속 실패한다고 나와요. 영상은 되는데 사진만 안 됩니다.', status:'처리중', answer:'', answerDate:'', handler:'김하경' },
+  { id:'INQ-003', date:'2026.06.04 09:15', title:'개인정보 수집 기간이 궁금해요', type:'개인 정보 문의', name:'박민수', contact:'010-3456-7890', method:'카카오 알림톡', content:'아이 개인정보가 얼마나 보관되는지 알고 싶습니다. 탈퇴 후에도 남아있나요?', status:'접수', answer:'', answerDate:'', handler:'' },
+  { id:'INQ-004', date:'2026.06.04 11:40', title:'댓글 기능이 안 눌려요', type:'오류/문제 제보', name:'최수연', contact:'010-4567-8901', method:'카카오 알림톡', content:'다른 친구 작품에 댓글을 쓰려고 하면 버튼이 눌리지 않아요.', status:'접수', answer:'', answerDate:'', handler:'' },
+  { id:'INQ-005', date:'2026.06.05 08:30', title:'앱이 정말 좋아요!', type:'하고 싶은 말', name:'정하늘', contact:'010-5678-9012', method:'카카오 알림톡', content:'아이가 매일 챌린지 하고 싶다고 졸라요. 정말 좋은 앱 만들어주셔서 감사합니다!', status:'완료', answer:'', answerDate:'2026.06.05 10:00', handler:'김하경' },
+  { id:'INQ-006', date:'2026.06.05 13:20', title:'캐릭터 꾸미기 방법이 궁금해요', type:'앱 사용 방법', name:'강준호', contact:'010-6789-0123', method:'카카오 알림톡', content:'캐릭터 꾸미기에서 잠금 표시가 있는 아이템은 어떻게 열 수 있나요?', status:'접수', answer:'', answerDate:'', handler:'' },
+];
+
+function inqStatusBadge(status) {
+  if (status === '접수')  return `<span class="badge badge-inq-new">접수</span>`;
+  if (status === '처리중') return `<span class="badge badge-inq-prog">처리중</span>`;
+  return `<span class="badge badge-inq-done">완료</span>`;
+}
+
+function renderInquiries() {
+  const type   = document.getElementById('inq-type-filter').value;
+  const status = document.getElementById('inq-status-filter').value;
+  const q      = document.getElementById('inq-search').value.toLowerCase();
+
+  let data = [...inquiries];
+  if (type)   data = data.filter(i => i.type === type);
+  if (status) data = data.filter(i => i.status === status);
+  if (q)      data = data.filter(i => i.name.includes(q) || i.title.toLowerCase().includes(q) || i.id.toLowerCase().includes(q));
+
+  // 통계
+  document.getElementById('inq-stat-pending').textContent  = inquiries.filter(i => i.status === '접수').length;
+  document.getElementById('inq-stat-progress').textContent = inquiries.filter(i => i.status === '처리중').length;
+  document.getElementById('inq-stat-total').textContent    = inquiries.length;
+
+  const tbody = document.getElementById('inq-tbody');
+  const empty = document.getElementById('inq-empty');
+  if (!data.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = data.map(i => `
+    <tr style="cursor:pointer" onclick="openInquiryDetail('${i.id}')">
+      <td style="font-family:monospace;font-size:12px;color:#6b7280">${i.id}</td>
+      <td style="color:#9ca3af;font-size:12px">${i.date}</td>
+      <td><span style="font-size:12px;background:#f3f4f6;padding:2px 8px;border-radius:100px;color:#374151">${i.type}</span></td>
+      <td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.title}</td>
+      <td>${i.name}</td>
+      <td style="color:#6b7280;font-size:12px">${i.method}</td>
+      <td>${inqStatusBadge(i.status)}</td>
+      <td style="color:#6b7280;font-size:12px">${i.handler || '-'}</td>
+      <td style="text-align:right">
+        <button class="btn-secondary" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();openInquiryDetail('${i.id}')">
+          ${i.status === '완료' ? '보기' : '답변'}
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+let currentInqId = null;
+
+function getAlimtalkPreview(type, answer) {
+  const needsAntiKakao = (type === '앱 사용 방법' || type === '개인 정보 문의');
+  const tail = needsAntiKakao
+    ? '\n\n※ 추가 문의는 카카오톡이 아닌 아하오호 앱 내 문의하기를 이용해 주세요. (카카오톡 채널에서 추가 대화는 불가합니다)'
+    : '';
+  return `[아하오호] 문의해주신 내용에 답변드립니다.\n\n${answer}${tail}`;
+}
+
+function openInquiryDetail(id) {
+  currentInqId = id;
+  const i = inquiries.find(x => x.id === id);
+  const policy = INQ_POLICY[i.type] || { answerRequired: false, sla: false, label: '답변 선택' };
+
+  document.getElementById('inq-detail-title').textContent = i.title;
+  document.getElementById('inq-detail-status-badge').innerHTML = inqStatusBadge(i.status);
+  document.getElementById('inq-d-num').textContent     = i.id;
+  document.getElementById('inq-d-date').textContent    = i.date;
+  document.getElementById('inq-d-name').textContent    = i.name;
+  document.getElementById('inq-d-contact').textContent = i.contact;
+  document.getElementById('inq-d-type').textContent    = i.type;
+  document.getElementById('inq-d-method').textContent  = i.method;
+  document.getElementById('inq-d-content').textContent = i.content;
+
+  // 정책 chips
+  const chips = [];
+  chips.push(`<span class="badge" style="background:#dbeafe;color:#1e40af;font-size:11px">📨 접수 알림톡 자동 발송됨</span>`);
+  chips.push(`<span class="badge ${policy.answerRequired ? 'badge-inq-new' : 'badge-inq-prog'}" style="font-size:11px">${policy.label}</span>`);
+  if (policy.sla) {
+    const deadline = addBusinessDays(i.date, 5);
+    chips.push(`<span class="badge" style="background:#fef3c7;color:#92400e;font-size:11px">⏰ ${deadline}까지 답변</span>`);
+  }
+  document.getElementById('inq-d-policy-info').innerHTML = chips.join('');
+
+  const isDone = i.status === '완료';
+  const prevWrap  = document.getElementById('inq-d-prev-answer-wrap');
+  const form      = document.getElementById('inq-d-answer-form');
+  const saveBtn   = document.getElementById('inq-save-btn');
+  const closeBtn  = document.getElementById('inq-close-btn');
+  const closeWrap = document.getElementById('inq-d-close-wrap');
+
+  if (isDone) {
+    prevWrap.style.display  = 'block';
+    form.style.display      = 'none';
+    saveBtn.style.display   = 'none';
+    closeBtn.style.display  = 'none';
+    closeWrap.style.display = 'none';
+    document.getElementById('inq-d-prev-answer').textContent  = i.answer || '(답변 없이 종결)';
+    document.getElementById('inq-d-answer-meta').textContent  = i.answerDate ? `${i.answerDate} · ${i.handler}` : `종결 처리 · ${i.handler}`;
+  } else {
+    prevWrap.style.display = 'none';
+    form.style.display     = 'block';
+    saveBtn.style.display  = 'inline-flex';
+
+    if (!policy.answerRequired) {
+      closeWrap.style.display = 'block';
+      closeBtn.style.display  = 'inline-flex';
+      saveBtn.textContent     = '알림톡 발송 후 저장';
+    } else {
+      closeWrap.style.display = 'none';
+      closeBtn.style.display  = 'none';
+      saveBtn.textContent     = '알림톡 발송 후 저장';
+    }
+
+    document.getElementById('inq-answer-label').textContent = policy.answerRequired ? '답변 작성 *' : '답변 작성 (선택)';
+    document.getElementById('inq-answer-input').value       = i.answer || '';
+    document.getElementById('inq-handler-input').value      = i.handler || '김하경';
+    document.getElementById('inq-status-input').value       = '완료';
+
+    // 알림톡 미리보기 실시간 업데이트
+    const previewWrap = document.getElementById('inq-alimtalk-preview-wrap');
+    const preview     = document.getElementById('inq-alimtalk-preview');
+    if (policy.answerRequired) {
+      previewWrap.style.display = 'block';
+      const textarea = document.getElementById('inq-answer-input');
+      const updatePreview = () => {
+        preview.textContent = getAlimtalkPreview(i.type, textarea.value || '(답변 내용)');
+      };
+      textarea.oninput = updatePreview;
+      updatePreview();
+    } else {
+      previewWrap.style.display = 'none';
+    }
+  }
+
+  openModal('modal-inquiry-detail');
+}
+
+function saveInquiryAnswer() {
+  const i = inquiries.find(x => x.id === currentInqId);
+  if (!i) return;
+  const policy = INQ_POLICY[i.type] || {};
+  const answer  = document.getElementById('inq-answer-input').value.trim();
+  const handler = document.getElementById('inq-handler-input').value.trim();
+  if (policy.answerRequired && !answer) { alert('답변 내용을 입력하세요.'); return; }
+  i.answer  = answer;
+  i.handler = handler;
+  i.status  = '완료';
+  const now = new Date();
+  i.answerDate = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  closeModal('modal-inquiry-detail');
+  renderInquiries();
+}
+
+function closeInquiry() {
+  const i = inquiries.find(x => x.id === currentInqId);
+  if (!i) return;
+  i.status  = '완료';
+  i.answer  = '';
+  i.handler = document.getElementById('inq-handler-input').value.trim() || '김하경';
+  const now = new Date();
+  i.answerDate = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  closeModal('modal-inquiry-detail');
+  renderInquiries();
+}
+
+// 초기 렌더링
+renderCohorts();
+renderMembers(members);
+renderPosts();
+renderInquiries();
+</script>
+
+</body>
+</html>
