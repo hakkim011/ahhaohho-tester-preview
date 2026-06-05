@@ -17,7 +17,7 @@
     --ed-border: rgba(255,255,255,0.09);
     --ed-text: #e2e2e2;
     --ed-sub: rgba(255,255,255,0.38);
-    --card-bg: #FFF5E8;
+    --card-bg: #FEFEE8;
   }
   body { font-family: 'Pretendard', sans-serif; height: 100vh; overflow: hidden; }
   .app { display: flex; height: 100vh; }
@@ -364,10 +364,16 @@ function buildPattern(weekNum) {
       const color = COLORS[Math.floor(rand() * COLORS.length)];
       const size  = 30 + rand() * 16;
       const rot   = rand() * 360;
-      // nested svg: 각 모양을 cx,cy 중심으로 배치
+      // viewBox 비율 유지해서 가로세로 계산
+      const vbParts = shape.vb.split(' ');
+      const vbW = parseFloat(vbParts[2]);
+      const vbH = parseFloat(vbParts[3]);
+      const ratio = vbW / vbH;
+      const sw = ratio >= 1 ? size : size * ratio;
+      const sh = ratio >= 1 ? size / ratio : size;
       svgParts.push(
-        `<svg x="${cx - size/2}" y="${cy - size/2}" width="${size}" height="${size}" viewBox="${shape.vb}">
-           <g transform="rotate(${rot},${parseFloat(shape.vb.split(' ')[2])/2},${parseFloat(shape.vb.split(' ')[3])/2})">
+        `<svg x="${cx - sw/2}" y="${cy - sh/2}" width="${sw}" height="${sh}" viewBox="${shape.vb}">
+           <g transform="rotate(${rot},${vbW/2},${vbH/2})">
              <path d="${shape.d}" fill="${color}"/>
            </g>
          </svg>`
@@ -376,9 +382,9 @@ function buildPattern(weekNum) {
   }
 
   const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
-    <rect width="${W}" height="${H}" fill="#FFF5E8"/>
+    <rect width="${W}" height="${H}" fill="#FEFEE8"/>
     ${svgParts.join('')}
-    <rect width="${W}" height="${H}" fill="rgba(255,245,232,0.78)"/>
+    <rect width="${W}" height="${H}" fill="rgba(254,254,232,0.78)"/>
   </svg>`;
 
   const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(fullSvg);
