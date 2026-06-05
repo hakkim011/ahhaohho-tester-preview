@@ -619,9 +619,19 @@ function render() {
         ? `<div class="board-empty">← 왼쪽에서 카드를 추가해보세요</div>`
         : rowsHtml(page1Cards)}
     </div>
-    ${restPages.map(group => `
-      <div class="board-continuation">${rowsHtml(group)}</div>
-    `).join('')}
+    ${restPages.map((group, idx) => {
+      const pageNum = idx + 2;
+      const totalPages = 1 + restPages.length;
+      const weekLabel = metaParts[1] || '';
+      return `
+      <div class="board-continuation">
+        ${rowsHtml(group)}
+        <div style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(11,18,21,0.08);display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:rgba(11,18,21,0.35);font-weight:500">아크크 시드 프로젝트 · ${weekLabel} 선정작</span>
+          <span style="font-family:'Poppins',sans-serif;font-size:12px;color:rgba(11,18,21,0.25);font-weight:600">${pageNum} / ${totalPages}</span>
+        </div>
+      </div>`;
+    }).join('')}
   `;
   scaleBoard();
 }
@@ -650,17 +660,16 @@ async function exportImage() {
   const prevTransform = wrap.style.transform;
   wrap.style.transform = 'scale(1)';
 
-  const logo = board.querySelector('.board-logo');
-  if (logo) logo.style.visibility = 'hidden';
-
   const baseName = [kisu, week].filter(Boolean).join('_') || '시드프로젝트';
 
   try {
-    // 페이지1: 헤더 + board-body
+    // 페이지1: 헤더 + board-body — 클론 후 로고만 숨겨서 레이아웃 유지
     const p1 = makePageEl([
       board.querySelector('.board-header'),
       board.querySelector('.board-body'),
     ]);
+    const p1Logo = p1.querySelector('.board-logo');
+    if (p1Logo) p1Logo.style.opacity = '0';
     const c1 = await captureEl(p1);
     p1.remove();
     dlCanvas(c1, `${baseName}_시드프로젝트_1p.png`);
@@ -679,7 +688,6 @@ async function exportImage() {
     alert('이미지 저장에 실패했어요. PDF로 저장해주세요.');
   } finally {
     wrap.style.transform = prevTransform;
-    if (logo) logo.style.visibility = '';
   }
 }
 
