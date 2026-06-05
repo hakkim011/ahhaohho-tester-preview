@@ -615,6 +615,10 @@ function render() {
     restPages.push(cards.slice(i, i + 6));
   }
 
+  // PDF 파일명용 title 동적 업데이트
+  const titleLabel = ['아크크', ...[kisu, week].filter(Boolean), '시드 프로젝트'].join(' ');
+  document.title = titleLabel;
+
   document.getElementById('board').innerHTML = `
     <div class="board-header">
       <div class="hd-left">
@@ -671,7 +675,7 @@ async function exportImage() {
   const prevTransform = wrap.style.transform;
   wrap.style.transform = 'scale(1)';
 
-  const baseName = [kisu, week].filter(Boolean).join('_') || '시드프로젝트';
+  const baseName = ['아크크', ...[kisu, week].filter(Boolean), '시드 프로젝트'].join(' ');
 
   try {
     // 페이지1: 헤더 + board-body — 클론 후 로고만 숨겨서 레이아웃 유지
@@ -683,7 +687,7 @@ async function exportImage() {
     if (p1Logo) p1Logo.style.opacity = '0';
     const c1 = await captureEl(p1);
     p1.remove();
-    dlCanvas(c1, `${baseName}_시드프로젝트_1p.png`);
+    dlCanvas(c1, `${baseName}_1.png`);
 
     // 페이지2~: 각 continuation
     const conts = board.querySelectorAll('.board-continuation');
@@ -691,7 +695,7 @@ async function exportImage() {
       const pEl = makePageEl([conts[i]]);
       const c = await captureEl(pEl);
       pEl.remove();
-      dlCanvas(c, `${baseName}_시드프로젝트_${i + 2}p.png`);
+      dlCanvas(c, `${baseName}_${i + 2}.png`);
     }
 
   } catch (err) {
