@@ -419,18 +419,18 @@
         <div class="row2">
           <div class="ig">
             <label>기수</label>
-            <input type="text" id="in-kisu" placeholder="3기" oninput="render()">
+            <input type="text" id="in-kisu" placeholder="3기" oninput="debouncedRender()">
           </div>
           <div class="ig">
             <label>주차</label>
-            <input type="text" id="in-week" placeholder="3주차" oninput="render()">
+            <input type="text" id="in-week" placeholder="3주차" oninput="debouncedRender()">
           </div>
         </div>
         <div class="ig">
           <label>기간</label>
           <div class="row2">
-            <input type="date" id="in-date-start" oninput="render()" placeholder="시작일">
-            <input type="date" id="in-date-end" oninput="render()" placeholder="종료일">
+            <input type="date" id="in-date-start" oninput="debouncedRender()" placeholder="시작일">
+            <input type="date" id="in-date-end" oninput="debouncedRender()" placeholder="종료일">
           </div>
         </div>
       </div>
@@ -464,6 +464,13 @@
 /* ── STATE ── */
 let cards = [];
 let nextId = 1;
+
+/* ── 디바운스 렌더 — 타이핑 멈춘 후 300ms 뒤 한 번만 렌더 ── */
+let renderTimer = null;
+function debouncedRender() {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(render, 300);
+}
 
 /* ── HELPERS ── */
 function getInfo() {
@@ -500,7 +507,7 @@ function removeCard(id) {
 
 function updateCard(id, field, value) {
   const card = cards.find(c => c.id === id);
-  if (card) { card[field] = value; render(); }
+  if (card) { card[field] = value; debouncedRender(); }
 }
 
 function updateCounter(id, field, value) {
