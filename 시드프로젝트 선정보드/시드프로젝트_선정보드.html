@@ -599,16 +599,7 @@ function render() {
 
   document.getElementById('board').innerHTML = `
     <div class="board-header">
-      <svg style="position:absolute;width:420px;height:420px;top:-100px;right:-80px;pointer-events:none;"
-           viewBox="0 0 420 420" overflow="visible" xmlns="http://www.w3.org/2000/svg">
-        <g opacity="0.08">
-          <ellipse fill="none" stroke="#0b1215" stroke-width="3.5" cx="210" cy="210" rx="178" ry="71"/>
-          <ellipse fill="none" stroke="#0b1215" stroke-width="2.5" cx="210" cy="210" rx="198" ry="79"/>
-          <ellipse fill="none" stroke="#0b1215" stroke-width="2"   cx="210" cy="210" rx="216" ry="86"/>
-          <ellipse fill="none" stroke="#0b1215" stroke-width="1.5" cx="210" cy="210" rx="232" ry="93"/>
-          <circle  fill="#0b1215" cx="210" cy="210" r="162"/>
-        </g>
-      </svg>
+      <div style="position:absolute;width:420px;height:420px;top:-100px;right:-80px;background:#0b1215;border-radius:50%;opacity:0.08;pointer-events:none;"></div>
       <div class="hd-deco-dot"></div>
       <div class="hd-left">
         <img class="board-logo" src="../메이커작품집/Logo1.svg" onerror="this.style.display='none'">
