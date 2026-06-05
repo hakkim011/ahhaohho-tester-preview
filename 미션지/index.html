@@ -126,7 +126,7 @@
   .card-bg-pattern {
     position: absolute; inset: 0; z-index: 0; pointer-events: none;
   }
-  .card-content { position: relative; z-index: 1; padding: 52px 52px 60px; }
+  .card-content { position: relative; z-index: 2; padding: 52px 52px 60px; }
 
   /* header */
   .card-header {
@@ -352,24 +352,33 @@ function seededRand(seed) {
 }
 
 /* ── PATTERN BACKGROUND ── */
+// ShapeType6 (4-pointed star) 만 사용 — 레퍼런스와 가장 유사
+const STAR_SHAPE = SHAPES[2]; // viewBox 0 0 48 48, 4-pointed star path
+
 function buildPattern(weekNum) {
   const rand = seededRand(weekNum * 12345 + 9876);
   const items = [];
-  for (let i = 0; i < 55; i++) {
-    const shape = SHAPES[Math.floor(rand() * SHAPES.length)];
-    const color = COLORS[Math.floor(rand() * COLORS.length)];
-    const x = rand() * 100;
-    const y = rand() * 100;
-    const size = 22 + rand() * 36;
-    const rot = rand() * 360;
-    const opacity = 0.55 + rand() * 0.35;
-    items.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${shape.vb}"
-      style="position:absolute;left:${x}%;top:${y}%;width:${size}px;height:${size}px;
-      transform:translate(-50%,-50%) rotate(${rot}deg);opacity:${opacity}">
-      <path d="${shape.d}" fill="${color}"/>
-    </svg>`);
+  // 그리드 기반 배치 — 7열 × 10행
+  const cols = 7, rows = 10;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      // 그리드 중심에서 ±8% 랜덤 오프셋
+      const cx = (c + 0.5) / cols * 100 + (rand() - 0.5) * 8;
+      const cy = (r + 0.5) / rows * 100 + (rand() - 0.5) * 8;
+      const color = COLORS[Math.floor(rand() * COLORS.length)];
+      // 크기 편차 줄임: 30~46px
+      const size = 30 + rand() * 16;
+      const rot  = rand() * 360;
+      items.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${STAR_SHAPE.vb}"
+        style="position:absolute;left:${cx}%;top:${cy}%;width:${size}px;height:${size}px;
+        transform:translate(-50%,-50%) rotate(${rot}deg)">
+        <path d="${STAR_SHAPE.d}" fill="${color}"/>
+      </svg>`);
+    }
   }
-  return `<div class="card-bg-pattern">${items.join('')}</div>`;
+  // 딤 오버레이 — 배경 집중도 낮춤
+  const overlay = `<div style="position:absolute;inset:0;background:rgba(255,245,232,0.58);z-index:1"></div>`;
+  return `<div class="card-bg-pattern" style="z-index:0">${items.join('')}${overlay}</div>`;
 }
 
 /* ── RENDER CARD ── */
