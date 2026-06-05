@@ -1221,7 +1221,7 @@ function addMember() {
   document.getElementById('input-realname').value = '';
   document.getElementById('selected-user-info').style.display = 'none';
   filterMembers();
-  showToast('참여자를 추가했어요');
+  showToast(`${realName}을(를) 참여자로 추가했어요`);
 }
 
 /* ── 탈락 처리 ── */
@@ -1238,13 +1238,14 @@ function confirmDrop() {
   closeModal('modal-drop-confirm');
   dropTargetId = null;
   filterMembers();
-  showToast('탈락 처리했어요');
+  showToast(`${m ? m.name : '참여자'}을(를) 탈락 처리했어요`);
 }
 
 /* ── 기수 추가 ── */
 function saveCohort() {
+  const num = document.querySelector('#modal-add-cohort input[type=number]').value;
   closeModal('modal-add-cohort');
-  showToast('기수를 추가했어요');
+  showToast(`${num ? num + '기를' : '기수를'} 추가했어요`);
 }
 
 /* ── 모달 ── */
@@ -1539,7 +1540,7 @@ function confirmSeed() {
   p.seedType = p.type === 'challenge' ? 'challenge' : 'free';
   closeModal('modal-seed');
   renderPosts();
-  showToast('🌱 시드 프로젝트로 지정했어요');
+  showToast(`🌱 ${p.author}의 게시물을 시드 프로젝트로 지정했어요`);
 }
 
 /* ── 숨김/노출 ── */
@@ -1562,7 +1563,8 @@ function confirmHide(action) {
   closeModal('modal-hide');
   closeModal('modal-show');
   renderPosts();
-  showToast(action === 'hide' ? '게시물을 숨겼어요' : '게시물을 다시 노출했어요');
+  const author = p ? p.author : '';
+  showToast(action === 'hide' ? `${author}의 게시물을 숨겼어요` : `${author}의 게시물을 다시 노출했어요`);
 }
 
 /* ── 삭제 ── */
@@ -1574,17 +1576,18 @@ function openDeletePostModal(postId) {
   openModal('modal-del-post');
 }
 function confirmDeletePost() {
+  const p = posts.find(x => x.id === targetPostId);
   posts = posts.filter(x => x.id !== targetPostId);
   closeModal('modal-del-post');
   renderPosts();
-  showToast('게시물을 삭제했어요');
+  showToast(`${p ? p.author + '의 게시물을' : '게시물을'} 삭제했어요`);
 }
 
 function unseed(postId) {
   const p = posts.find(x => x.id === postId);
   if (p) p.seedType = null;
   renderPosts();
-  showToast('시드 지정을 해제했어요');
+  showToast(`${p ? p.author + '의 게시물' : '게시물'} 시드 지정을 해제했어요`);
 }
 
 /* ── 문의 데이터 ── */
