@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아크크 미션지 생성기</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --brand-black: #0B1215;
+    --brand-neon: #edff4b;
+    --ed-bg: #18191b;
+    --ed-surface: rgba(255,255,255,0.05);
+    --ed-border: rgba(255,255,255,0.09);
+    --ed-text: #e2e2e2;
+    --ed-sub: rgba(255,255,255,0.38);
+    --card-bg: #FFF5E8;
+  }
+  body { font-family: 'Pretendard', sans-serif; height: 100vh; overflow: hidden; }
+  .app { display: flex; height: 100vh; }
+
+  /* ── EDITOR ── */
+  .editor {
+    width: 320px; flex-shrink: 0;
+    background: var(--ed-bg); color: var(--ed-text);
+    display: flex; flex-direction: column;
+    border-right: 1px solid var(--ed-border); overflow: hidden;
+  }
+  .editor-top {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--ed-border);
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+  .editor-top-title { font-size: 14px; font-weight: 800; color: var(--brand-neon); }
+  .editor-scroll {
+    flex: 1; overflow-y: auto; padding: 18px 20px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .editor-scroll::-webkit-scrollbar { width: 3px; }
+  .editor-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  .sec-label { font-size: 10px; font-weight: 700; color: var(--ed-sub); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
+  .ig { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .ig label { font-size: 11px; font-weight: 600; color: var(--ed-sub); }
+  .ig input, .ig select, .ig textarea {
+    background: var(--ed-surface); border: 1px solid var(--ed-border);
+    border-radius: 8px; padding: 8px 11px; color: var(--ed-text);
+    font-family: inherit; font-size: 13px; outline: none; width: 100%;
+  }
+  .ig input:focus, .ig select:focus { border-color: var(--brand-neon); }
+  .ig select option { background: #2a2a2a; }
+  .ig textarea { resize: none; height: 52px; line-height: 1.5; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* challenge list editor */
+  .challenge-input-row { display: flex; gap: 6px; margin-bottom: 8px; }
+  .challenge-input-row input {
+    flex: 1; background: var(--ed-surface); border: 1px solid var(--ed-border);
+    border-radius: 8px; padding: 7px 10px; color: var(--ed-text);
+    font-family: inherit; font-size: 13px; outline: none;
+  }
+  .challenge-input-row input:focus { border-color: var(--brand-neon); }
+  .btn-add-ch {
+    background: rgba(237,255,75,0.12); border: 1px solid rgba(237,255,75,0.3);
+    border-radius: 8px; padding: 7px 12px; color: var(--brand-neon);
+    font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  }
+  .btn-add-ch:hover { background: rgba(237,255,75,0.2); }
+  .ch-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--ed-border);
+    border-radius: 6px; padding: 4px 8px; font-size: 12px; margin: 3px;
+  }
+  .ch-tag button {
+    background: none; border: none; color: rgba(255,255,255,0.3);
+    cursor: pointer; font-size: 13px; line-height: 1; padding: 0;
+  }
+  .ch-tag button:hover { color: #ff6b6b; }
+
+  /* mission preview override */
+  .mission-preview-row {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .mission-item-row { display: flex; gap: 4px; align-items: center; }
+  .mission-item-row input {
+    flex: 1; background: var(--ed-surface); border: 1px solid var(--ed-border);
+    border-radius: 6px; padding: 6px 9px; color: var(--ed-text);
+    font-family: inherit; font-size: 12px; outline: none;
+  }
+  .mission-item-row input:focus { border-color: var(--brand-neon); }
+  .btn-del-m { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 14px; }
+  .btn-del-m:hover { color: #ff6b6b; }
+
+  /* editor footer */
+  .editor-footer {
+    padding: 12px 20px; border-top: 1px solid var(--ed-border); flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .exp-btn {
+    width: 100%; padding: 10px; border: none; border-radius: 10px;
+    font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .exp-btn.primary { background: var(--brand-neon); color: var(--brand-black); }
+  .exp-btn.secondary { background: rgba(255,255,255,0.07); color: var(--ed-text); }
+  .exp-btn-row { display: flex; gap: 6px; }
+  .exp-btn-row .exp-btn { flex: 1; }
+
+  /* ── PREVIEW ── */
+  .preview-area {
+    flex: 1; overflow: auto; background: #1a1a1a;
+    display: flex; align-items: flex-start; justify-content: center; padding: 32px;
+  }
+  .card-scale-wrap { transform-origin: top left; }
+
+  /* ── MISSION CARD ── */
+  #mission-card {
+    width: 800px;
+    background: var(--card-bg);
+    font-family: 'Pretendard', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-bg-pattern {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  }
+  .card-content { position: relative; z-index: 1; padding: 52px 52px 60px; }
+
+  /* header */
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .card-kisu {
+    font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700;
+    color: rgba(11,18,21,0.45); letter-spacing: .08em; text-transform: uppercase;
+  }
+  .card-logo-img { height: 36px; opacity: 0.85; }
+
+  /* week */
+  .card-week-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .card-week-num {
+    font-family: 'Poppins', sans-serif; font-size: 72px; font-weight: 900;
+    color: var(--brand-black); line-height: 1; letter-spacing: -2px;
+  }
+  .card-week-label {
+    font-size: 28px; font-weight: 900; color: var(--brand-black);
+    letter-spacing: -0.5px;
+  }
+  .card-badges { display: flex; gap: 8px; margin-bottom: 36px; flex-wrap: wrap; }
+  .badge-theme {
+    display: inline-block; padding: 6px 16px;
+    background: var(--brand-black); color: var(--brand-neon);
+    font-size: 13px; font-weight: 800; border-radius: 100px;
+  }
+  .badge-event {
+    display: inline-block; padding: 6px 16px;
+    background: rgba(11,18,21,0.08); color: var(--brand-black);
+    font-size: 13px; font-weight: 700; border-radius: 100px;
+  }
+
+  /* mission section */
+  .card-section { margin-bottom: 28px; }
+  .card-section-title {
+    font-size: 13px; font-weight: 800; color: rgba(11,18,21,0.4);
+    letter-spacing: .1em; text-transform: uppercase;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .card-section-title::after {
+    content: ''; flex: 1; height: 1px; background: rgba(11,18,21,0.1);
+  }
+  .mission-list { display: flex; flex-direction: column; gap: 10px; }
+  .mission-item {
+    display: flex; align-items: center; gap: 12px;
+    background: white; border-radius: 12px; padding: 14px 18px;
+    box-shadow: 0 2px 8px rgba(11,18,21,0.05);
+  }
+  .mission-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--brand-neon); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mission-check svg { width: 12px; height: 12px; }
+  .mission-text { font-size: 15px; font-weight: 700; color: var(--brand-black); }
+
+  /* challenge chips */
+  .challenge-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .challenge-chip {
+    display: inline-block; padding: 8px 16px;
+    background: white; border: 1.5px solid rgba(11,18,21,0.1);
+    border-radius: 100px; font-size: 14px; font-weight: 700; color: var(--brand-black);
+    box-shadow: 0 2px 8px rgba(11,18,21,0.05);
+  }
+
+  /* free missions */
+  .free-mission-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .free-mission-item {
+    display: flex; align-items: center; gap: 8px;
+    background: white; border-radius: 10px; padding: 11px 14px;
+    font-size: 13px; font-weight: 600; color: rgba(11,18,21,0.7);
+    box-shadow: 0 2px 8px rgba(11,18,21,0.04);
+  }
+  .free-mission-emoji { font-size: 16px; }
+
+  /* completion */
+  .card-completion {
+    margin-top: 32px;
+    background: var(--brand-black); border-radius: 16px;
+    padding: 22px 28px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .completion-icon { font-size: 28px; flex-shrink: 0; }
+  .completion-text-label {
+    font-size: 11px; font-weight: 700; color: rgba(237,255,75,0.6);
+    letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .completion-text {
+    font-size: 18px; font-weight: 900; color: var(--brand-neon);
+    line-height: 1.2;
+  }
+  .completion-sub {
+    font-size: 12px; color: rgba(237,255,75,0.5); margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── 편집 패널 ── -->
+  <aside class="editor">
+    <div class="editor-top">
+      <span style="font-size:18px">📋</span>
+      <span class="editor-top-title">미션지 생성기</span>
+    </div>
+
+    <div class="editor-scroll">
+
+      <!-- 기본 정보 -->
+      <div>
+        <div class="sec-label">기본 정보</div>
+        <div class="row2">
+          <div class="ig">
+            <label>기수</label>
+            <input type="text" id="in-kisu" placeholder="1기" oninput="renderCard()">
+          </div>
+          <div class="ig">
+            <label>주차</label>
+            <select id="in-week" onchange="onWeekChange()">
+              <option value="1">1주차</option>
+              <option value="2">2주차</option>
+              <option value="3">3주차</option>
+              <option value="4">4주차 ⭐</option>
+              <option value="5">5주차</option>
+              <option value="6">6주차</option>
+              <option value="7">7주차</option>
+              <option value="8">8주차 ⭐</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 주간 미션 -->
+      <div>
+        <div class="sec-label">주간 미션</div>
+        <div class="mission-preview-row" id="mission-items-editor"></div>
+      </div>
+
+      <!-- 챌린지 목록 (챌린지 주차만) -->
+      <div id="challenge-section">
+        <div class="sec-label">챌린지 목록</div>
+        <div class="challenge-input-row">
+          <input type="text" id="ch-input" placeholder="챌린지명 입력" onkeydown="if(event.key==='Enter')addChallenge()">
+          <button class="btn-add-ch" onclick="addChallenge()">+ 추가</button>
+        </div>
+        <div id="ch-tags"></div>
+      </div>
+
+    </div>
+
+    <div class="editor-footer">
+      <div class="exp-btn-row">
+        <button class="exp-btn secondary" onclick="saveToFile()">💾 저장</button>
+        <button class="exp-btn secondary" onclick="document.getElementById('load-input').click()">📂 불러오기</button>
+        <input type="file" id="load-input" accept=".json" style="display:none" onchange="loadFromFile(this)">
+      </div>
+      <button class="exp-btn primary" onclick="exportImage()">🖼️ 이미지로 저장</button>
+    </div>
+  </aside>
+
+  <!-- ── 미리보기 ── -->
+  <main class="preview-area" id="preview-area">
+    <div class="card-scale-wrap" id="card-scale-wrap">
+      <div id="mission-card"></div>
+    </div>
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+
+/* ── 고정 데이터 ── */
+const COLORS = ['#00DC5A','#FE09D2','#FFD100','#E82246','#785944','#1F3DE9','#FF6512','#590AD7','#00DFFE'];
+
+// 모양 조각 SVG 경로 (ShapeType 3,4,6,8,13,26,33)
+const SHAPES = [
+  { vb:'0 0 45.47 48', d:`M5.05.51C1.52.51,0,5.05,0,10.61c0,8.59,3.54,17.68,10.11,24.76,3.54,3.54,7.58,5.56,9.6,9.09,1.01,2.02,2.02,3.54,3.03,3.54s2.02-1.52,3.03-3.54c2.02-3.54,6.06-5.56,9.6-9.09,6.57-7.07,10.11-16.17,10.11-24.76,0-5.56-1.52-10.11-5.05-10.11-4.55,0-6.57,6.57-8.08,13.14C30.32,9.09,27.28.51,22.74,0c-4.55.51-7.58,9.09-9.6,13.64C11.62,7.07,9.6.51,5.05.51Z` },
+  { vb:'0 0 45.33 48', d:`M45.07,19.12c-.25-2.99-2.99-2.74-2.99-2.74,0,0-3.98-.25-3.98-1.74-.25-1.74,7.47-.5,7.22-3.98s-6.72-2.49-6.72-3.98c0,0-.5-1,3.49-1.49,0,0,2.49,0,2.99-1.99s-1-2.99-2.99-2.99c-2.99-.5-8.47,0-10.46,1-1.49.75-3.98,2.49-5.48,5.48,0,0-1.49,2.99-3.49,4.98-1.99-1.99-3.49-4.98-3.49-4.98-1.49-2.99-3.98-4.73-5.48-5.48C11.71.2,6.23-.3,3.24.2,1.25.2-.24,1.19.25,3.18s2.99,1.99,2.99,1.99c3.98.5,3.49,1.49,3.49,1.49C6.73,8.16.25,7.17,0,10.65s7.47,2.24,7.22,3.98c0,1.49-3.98,1.74-3.98,1.74,0,0-2.74-.25-2.99,2.74-.25,2.49,1.99,3.49,1.99,3.49,2.49,1,5.48.5,7.97,1.49,1.49.5,4.48,2.49,6.47,6.47,1,2.49,1.49,5.98,1,10.46-.5,3.49,1,6.97,4.98,6.97s5.48-3.49,4.98-6.97c-.5-4.48,0-7.97,1-10.46,1.99-3.98,4.98-5.98,6.47-6.47,2.49-1,5.48-.5,7.97-1.49,0,0,2.24-1,1.99-3.49Z` },
+  { vb:'0 0 48 48',    d:`M24,0c.53,0,2.13,13.33,2.67,21.33,8,.53,21.33,2.13,21.33,2.67s-13.33,2.13-21.33,2.67c-.53,8-2.13,21.33-2.67,21.33s-2.13-13.33-2.67-21.33c-8-.53-21.33-2.13-21.33-2.67s13.33-2.13,21.33-2.67c.53-8,2.13-21.33,2.67-21.33Z` },
+  { vb:'0 0 47.29 48', d:`M40.87,13.24c-.37-.09-11.3.64-11.3.64-.1,0-.17-.1-.14-.19l2.5-6.72c.1-.28-.18-.54-.45-.43-11.48,4.96-4.24,4.09-14.18.51-.07-.03-.15.03-.14.11.2,2.13.54,6.72.67,6.84.04.04-7.56,4.6-9.64,5.43-.51.21,1.02.37,5.86,1.04.15.02,1.06,8.3,1.15,8.76.43,2.13,4.9-5.78,5.27-4.84l3.7,9.14c.09.23,1.76-8.77,1.75-8.75.03-.16.2-.26.35-.21,2.53.87,8.98,3.02,9.19,2.98.05-.01-3.01-7.78-2.96-7.84,2.95-2.73,8.59-6.42,8.37-6.48Z` },
+  { vb:'0 0 48 40.37', d:`M19.88,3.78c1.26,6.82,3.2,14.73,2.9,14.53-2.06-1.41-16.23-7.11-16.64-7.12-.41-.02,12.69,10.64,12.45,10.76-.73.36-2.42.19-12.28,1.33-.56.07-2.39-.1-.26.38.03,0,11.05,2.42,12.64,2.67.02,0-4.46,9.52-4.47,9.54-.66,1.33,7.72-8.73,7.74-8.75.1-.12-.05,6.01-.15,6.89-.31,2.67-.33,2.67-.3,2.68.1.01,4.42-9.33,4.57-9.13.31.43.17.32,3.01,6.56,1.09,2.39,1.21,2.27,1.16,2.17-.07-.52-1.13-9.14-.62-9.08.02,0,10.51,4.29,10.89,4.29.01,0-7.47-7.6-7.59-7.84-.12-.26-.33-.12,8.66-.16,6.16-.03,4.24-.14-1.06-1.37-2.37-.55-7.82-1.78-7.67-1.9.83-.63,5.1-4.97,6.23-6.33,2.5-2.99,3.71-2.53-6.28,1.63-1.17.49-3.77,1.58-3.76,1.45.32-4.73.81-8.82.88-9.43.18-1.59-3.55,9.69-4.06,9.88-.13.05-6.69-15.56-5.99-13.64Z` },
+  { vb:'0 0 48 20.95', d:`M.43,12.25C0,8.71,1.66,5.18,4.93,2.68c1.29-.99,2.96-1.86,4.93-1.85,2.31,0,4.46,1.26,5.56,2.75s1.34,3.17,1.4,4.8c.09-2.58.98-5.25,3.56-6.95,2.58-1.7,7.2-2.03,9.96-.17,2.95,1.98,2.56,5.18,3.53,7.9-.08-1.88-.15-3.82.83-5.51.98-1.69,3.32-3.07,5.99-2.86,2.91.23,5.13,2.21,6.14,4.18,1.32,2.58,1.23,5.32,1.13,7.98-.05,1.39-.12,2.81-.79,4.08-.68,1.27-2.09,2.4-4,2.66-1.91.26-4.03-.42-5.38-1.51s-2.02-2.52-2.16-3.91c-.99,2.65-4.05,4.77-7.84,5.42-1.51.26-3.19.29-4.68-.19-3.49-1.12-4.36-4.29-4.71-6.92-.83,2.51-2.73,4.78-5.41,6.46-1.43.9-3.14,1.65-5.09,1.85s-4.18-.22-5.56-1.31c-.96-.76-1.42-1.75-1.74-2.72-.68-2.1-.79-4.27-.15-4.61Z` },
+  { vb:'0 0 40.53 48', d:`M40.53,46.65c-.74-14.8-1.48-29.6-2.22-44.4C30.69.76,22.9.19,15.11,0c-.36,7.28-.55,14.15-1.13,20.81-3.23.05-6.47.1-9.88.45C2.3,29.89.92,38.72,0,47.83c16.08,0,23.2.84,40.53-1.17Z` },
+];
+
+const WEEK_DATA = {
+  1: { theme:'챌린지', event:'#오리엔테이션', missions:['챌린지 게시 1개','댓글 5개 이상','리액션 10개 이상'], isCh:true },
+  2: { theme:'챌린지', event:null, missions:['챌린지 게시 1개','댓글 5개 이상','리액션 10개 이상'], isCh:true },
+  3: { theme:'챌린지', event:null, missions:['챌린지 게시 1개','댓글 5개 이상','리액션 10개 이상'], isCh:true },
+  4: { theme:'프로필 자랑하기', event:'#1차 온라인 밋업', missions:['프로필 꾸미기','프로필 캡처 후 자율 게시 (캐릭터 소개)'], isCh:false },
+  5: { theme:'챌린지', event:null, missions:['챌린지 게시 1개','댓글 5개 이상','리액션 10개 이상'], isCh:true },
+  6: { theme:'자유 창작', event:null, missions:['자율 게시 1개','댓글 5개 이상','리액션 10개 이상'], isCh:false },
+  7: { theme:'챌린지', event:null, missions:['챌린지 게시 1개','댓글 5개 이상','리액션 10개 이상'], isCh:true },
+  8: { theme:'메이커 작품집', event:'#2차 온라인 밋업', missions:['메이커 작품집 만들기','게시물 설명 수정 등 작품집 퀄리티 높이기'], isCh:false },
+};
+
+const FREE_MISSIONS = [
+  { emoji:'📝', text:'자유 주제로 작품 올리기' },
+  { emoji:'💬', text:'친구 작품에 댓글 달기' },
+  { emoji:'💬', text:'댓글에 답글 달기' },
+  { emoji:'💬', text:'리액션 남기기' },
+  { emoji:'🎨', text:'캐릭터 꾸미기' },
+  { emoji:'🎨', text:'소개글 업데이트하기' },
+  { emoji:'📂', text:'게시물 설명 구체화하기' },
+];
+
+/* ── STATE ── */
+let missions = [];
+let challenges = [];
+
+/* ── SEEDED RANDOM ── */
+function seededRand(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xFFFFFFFF;
+    return (s >>> 0) / 0xFFFFFFFF;
+  };
+}
+
+/* ── PATTERN BACKGROUND ── */
+function buildPattern(weekNum) {
+  const rand = seededRand(weekNum * 12345 + 9876);
+  const items = [];
+  for (let i = 0; i < 55; i++) {
+    const shape = SHAPES[Math.floor(rand() * SHAPES.length)];
+    const color = COLORS[Math.floor(rand() * COLORS.length)];
+    const x = rand() * 100;
+    const y = rand() * 100;
+    const size = 22 + rand() * 36;
+    const rot = rand() * 360;
+    const opacity = 0.55 + rand() * 0.35;
+    items.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${shape.vb}"
+      style="position:absolute;left:${x}%;top:${y}%;width:${size}px;height:${size}px;
+      transform:translate(-50%,-50%) rotate(${rot}deg);opacity:${opacity}">
+      <path d="${shape.d}" fill="${color}"/>
+    </svg>`);
+  }
+  return `<div class="card-bg-pattern">${items.join('')}</div>`;
+}
+
+/* ── RENDER CARD ── */
+function renderCard() {
+  const kisu  = document.getElementById('in-kisu').value.trim();
+  const week  = parseInt(document.getElementById('in-week').value);
+  const data  = WEEK_DATA[week];
+
+  const kisuLabel = ['아크크', kisu].filter(Boolean).join(' ');
+  const weekLabel = `${week}주차`;
+
+  const missionsHtml = missions.map(m => `
+    <div class="mission-item">
+      <div class="mission-check">
+        <svg viewBox="0 0 12 9" fill="none"><path d="M1 4l3.5 3.5L11 1" stroke="#0B1215" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="mission-text">${m}</span>
+    </div>`).join('');
+
+  const challengeHtml = data.isCh && challenges.length > 0 ? `
+    <div class="card-section">
+      <div class="card-section-title">🎯 이번 주 챌린지</div>
+      <div class="challenge-chips">
+        ${challenges.map(c => `<span class="challenge-chip">${c}</span>`).join('')}
+      </div>
+    </div>` : '';
+
+  const freeMissionsHtml = `
+    <div class="card-section">
+      <div class="card-section-title">✨ 더 하고 싶다면?</div>
+      <div class="free-mission-grid">
+        ${FREE_MISSIONS.map(f => `
+          <div class="free-mission-item">
+            <span class="free-mission-emoji">${f.emoji}</span>
+            <span>${f.text}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  const completionHtml = `
+    <div class="card-completion">
+      <div class="completion-icon">🎉</div>
+      <div>
+        <div class="completion-text-label">미션 완료 후</div>
+        <div class="completion-text">"{닉네임} ${weekLabel} 완료!"</div>
+        <div class="completion-sub">단톡방에 외쳐주세요 💬</div>
+      </div>
+    </div>`;
+
+  document.getElementById('mission-card').innerHTML = `
+    ${buildPattern(week)}
+    <div class="card-content">
+      <div class="card-header">
+        <span class="card-kisu">${kisuLabel}</span>
+        <img class="card-logo-img" src="../메이커작품집/Logo1.svg" onerror="this.style.display='none'">
+      </div>
+      <div class="card-week-row">
+        <span class="card-week-num">${week}</span>
+        <span class="card-week-label">주차</span>
+      </div>
+      <div class="card-badges">
+        <span class="badge-theme">${data.theme}</span>
+        ${data.event ? `<span class="badge-event">${data.event}</span>` : ''}
+      </div>
+      <div class="card-section">
+        <div class="card-section-title">📌 이번 주 미션</div>
+        <div class="mission-list">${missionsHtml}</div>
+      </div>
+      ${challengeHtml}
+      ${freeMissionsHtml}
+      ${completionHtml}
+    </div>`;
+
+  scaleCard();
+}
+
+/* ── EDITOR: 주차 변경 ── */
+function onWeekChange() {
+  const week = parseInt(document.getElementById('in-week').value);
+  const data = WEEK_DATA[week];
+  missions = [...data.missions];
+  challenges = [];
+  renderMissionEditor();
+  renderChallengeSection();
+  renderCard();
+}
+
+function renderMissionEditor() {
+  const week = parseInt(document.getElementById('in-week').value);
+  document.getElementById('mission-items-editor').innerHTML = missions.map((m, i) => `
+    <div class="mission-item-row">
+      <input value="${m}" oninput="missions[${i}]=this.value;renderCard()">
+      <button class="btn-del-m" onclick="missions.splice(${i},1);renderMissionEditor();renderCard()">✕</button>
+    </div>`).join('') +
+    `<button class="btn-add-ch" style="margin-top:6px;width:100%" onclick="missions.push('새 미션');renderMissionEditor();renderCard()">+ 미션 추가</button>`;
+}
+
+function renderChallengeSection() {
+  const week = parseInt(document.getElementById('in-week').value);
+  const sec = document.getElementById('challenge-section');
+  sec.style.display = WEEK_DATA[week].isCh ? 'block' : 'none';
+  renderChallengeTags();
+}
+
+function addChallenge() {
+  const input = document.getElementById('ch-input');
+  const val = input.value.trim();
+  if (!val) return;
+  challenges.push(val);
+  input.value = '';
+  renderChallengeTags();
+  renderCard();
+}
+
+function removeChallenge(i) {
+  challenges.splice(i, 1);
+  renderChallengeTags();
+  renderCard();
+}
+
+function renderChallengeTags() {
+  document.getElementById('ch-tags').innerHTML = challenges.map((c, i) => `
+    <span class="ch-tag">${c}<button onclick="removeChallenge(${i})">✕</button></span>`).join('');
+}
+
+/* ── SCALE ── */
+function scaleCard() {
+  const area = document.getElementById('preview-area');
+  const wrap = document.getElementById('card-scale-wrap');
+  const card = document.getElementById('mission-card');
+  const availW = area.clientWidth - 64;
+  const scale = Math.min(availW / 800, 1);
+  wrap.style.transform = `scale(${scale})`;
+  wrap.style.width = '800px';
+  const scaledH = card.scrollHeight * scale;
+  wrap.style.marginBottom = (scaledH - card.scrollHeight) + 'px';
+}
+window.addEventListener('resize', scaleCard);
+
+/* ── EXPORT ── */
+async function exportImage() {
+  const card = document.getElementById('mission-card');
+  const wrap = document.getElementById('card-scale-wrap');
+  const prev = wrap.style.transform;
+  wrap.style.transform = 'scale(1)';
+  const logo = card.querySelector('.card-logo-img');
+  if (logo) logo.style.opacity = '0';
+  try {
+    const canvas = await html2canvas(card, { scale:2, allowTaint:true, useCORS:false, backgroundColor:'#FFF5E8', logging:false });
+    const kisu = document.getElementById('in-kisu').value.trim();
+    const week = document.getElementById('in-week').value;
+    const name = ['아크크', kisu, `${week}주차`, '미션지'].filter(Boolean).join(' ');
+    const a = document.createElement('a');
+    a.download = name + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  } catch(e) { alert('이미지 저장에 실패했어요.'); }
+  finally {
+    wrap.style.transform = prev;
+    if (logo) logo.style.opacity = '';
+  }
+}
+
+/* ── SAVE/LOAD ── */
+function saveToFile() {
+  const state = {
+    kisu: document.getElementById('in-kisu').value,
+    week: document.getElementById('in-week').value,
+    missions, challenges,
+  };
+  const a = document.createElement('a');
+  const kisu = state.kisu || '아크크';
+  a.download = `${kisu} ${state.week}주차 미션지.json`;
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(state,null,2)], {type:'application/json'}));
+  a.click();
+}
+function loadFromFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const s = JSON.parse(e.target.result);
+      document.getElementById('in-kisu').value = s.kisu || '';
+      document.getElementById('in-week').value = s.week || '1';
+      missions = s.missions || [];
+      challenges = s.challenges || [];
+      renderMissionEditor();
+      renderChallengeSection();
+      renderCard();
+    } catch { alert('파일을 불러오는 데 실패했어요.'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+/* ── INIT ── */
+onWeekChange();
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아크크 챌린지 목록</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --brand-black: #0B1215;
+    --brand-neon: #edff4b;
+    --bg: #FFF5E8;
+  }
+  body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--brand-black); min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .page-header {
+    background: var(--brand-black);
+    padding: 40px 48px 44px;
+    position: relative; overflow: hidden;
+  }
+  .header-inner { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+  .header-label {
+    font-size: 12px; font-weight: 700; color: rgba(237,255,75,0.55);
+    letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .header-title {
+    font-size: 40px; font-weight: 900; color: white; line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .header-title em {
+    font-style: normal;
+    background: var(--brand-neon); color: var(--brand-black);
+    padding: 2px 10px 4px; border-radius: 6px;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  }
+  .header-sub { font-size: 14px; color: rgba(255,255,255,0.45); margin-top: 12px; }
+  .header-count {
+    display: inline-block; margin-top: 16px;
+    background: rgba(255,255,255,0.1); border-radius: 100px;
+    padding: 6px 16px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7);
+  }
+
+  /* ── SEARCH ── */
+  .search-bar {
+    max-width: 960px; margin: 0 auto; padding: 28px 48px 0;
+  }
+  .search-input {
+    width: 100%; padding: 14px 20px; font-size: 15px;
+    background: white; border: 1.5px solid rgba(11,18,21,0.1);
+    border-radius: 12px; outline: none; font-family: inherit;
+    color: var(--brand-black);
+  }
+  .search-input:focus { border-color: var(--brand-black); }
+
+  /* ── GRID ── */
+  .content { max-width: 960px; margin: 0 auto; padding: 28px 48px 80px; }
+  .challenge-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .challenge-card {
+    background: white; border-radius: 14px; padding: 22px 20px;
+    border: 1.5px solid rgba(11,18,21,0.07);
+    display: flex; align-items: center; gap: 14px;
+    transition: transform .15s, box-shadow .15s;
+    cursor: default;
+  }
+  .challenge-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,18,21,0.08); }
+  .challenge-num {
+    font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 800;
+    color: rgba(11,18,21,0.2); flex-shrink: 0; width: 24px;
+  }
+  .challenge-name { font-size: 15px; font-weight: 700; color: var(--brand-black); line-height: 1.3; }
+
+  .empty-state { text-align: center; padding: 60px 0; color: rgba(11,18,21,0.3); font-size: 15px; }
+
+  /* ── EDIT PANEL (operator) ── */
+  .edit-fab {
+    position: fixed; bottom: 28px; right: 28px; z-index: 100;
+    background: var(--brand-black); color: var(--brand-neon);
+    border: none; border-radius: 100px; padding: 12px 22px;
+    font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .edit-fab:hover { background: #222; }
+
+  .edit-panel {
+    display: none; position: fixed; bottom: 80px; right: 28px; z-index: 99;
+    background: #18191b; border-radius: 16px; padding: 20px;
+    width: 340px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+  .edit-panel.open { display: block; }
+  .edit-panel-title { font-size: 13px; font-weight: 800; color: #edff4b; margin-bottom: 14px; }
+  .edit-input-row { display: flex; gap: 6px; margin-bottom: 10px; }
+  .edit-input-row input {
+    flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 8px; padding: 8px 11px; color: #e2e2e2;
+    font-family: inherit; font-size: 13px; outline: none;
+  }
+  .edit-input-row input:focus { border-color: #edff4b; }
+  .btn-add {
+    background: rgba(237,255,75,0.12); border: 1px solid rgba(237,255,75,0.3);
+    border-radius: 8px; padding: 8px 12px; color: #edff4b;
+    font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  }
+  .btn-add:hover { background: rgba(237,255,75,0.2); }
+  .edit-list { max-height: 200px; overflow-y: auto; margin-bottom: 12px; }
+  .edit-list::-webkit-scrollbar { width: 3px; }
+  .edit-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+  .edit-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px; color: #e2e2e2;
+  }
+  .edit-item:last-child { border-bottom: none; }
+  .btn-del {
+    background: none; border: none; color: rgba(255,255,255,0.25);
+    cursor: pointer; font-size: 14px;
+  }
+  .btn-del:hover { color: #ff6b6b; }
+  .edit-actions { display: flex; gap: 6px; }
+  .edit-action-btn {
+    flex: 1; padding: 8px; border: none; border-radius: 8px;
+    font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .edit-action-btn.save { background: #edff4b; color: #0B1215; }
+  .edit-action-btn.load { background: rgba(255,255,255,0.07); color: #e2e2e2; }
+  .edit-header-row { display: flex; gap: 6px; margin-bottom: 12px; }
+  .edit-header-input {
+    flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 8px; padding: 7px 10px; color: #e2e2e2;
+    font-family: inherit; font-size: 12px; outline: none;
+  }
+  .edit-header-input:focus { border-color: #edff4b; }
+  .edit-sublabel { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-label">아크크 체험단</div>
+    <div class="header-title">이번 기수<br><em>챌린지 목록</em></div>
+    <div class="header-sub" id="header-sub">아래 챌린지 중에서 자유롭게 골라서 도전해봐요!</div>
+    <div class="header-count" id="header-count"></div>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="search-bar">
+  <input class="search-input" type="text" placeholder="🔍 챌린지 검색" oninput="filterList(this.value)">
+</div>
+
+<!-- Grid -->
+<div class="content">
+  <div class="challenge-grid" id="challenge-grid"></div>
+  <div class="empty-state" id="empty-state" style="display:none">챌린지가 없어요.</div>
+</div>
+
+<!-- Edit FAB -->
+<button class="edit-fab" onclick="togglePanel()">✏️ 편집</button>
+
+<div class="edit-panel" id="edit-panel">
+  <div class="edit-panel-title">챌린지 목록 편집</div>
+
+  <div class="edit-sublabel">헤더</div>
+  <div class="edit-header-row" style="margin-bottom:14px">
+    <input class="edit-header-input" id="ed-kisu" placeholder="기수 (예: 1기)" oninput="renderList()">
+    <input class="edit-header-input" id="ed-sub" placeholder="부제 (선택)" oninput="renderList()">
+  </div>
+
+  <div class="edit-sublabel">챌린지</div>
+  <div class="edit-input-row">
+    <input type="text" id="new-ch-input" placeholder="챌린지명 입력" onkeydown="if(event.key==='Enter')addCh()">
+    <button class="btn-add" onclick="addCh()">+ 추가</button>
+  </div>
+  <div class="edit-list" id="edit-list"></div>
+
+  <div class="edit-actions">
+    <button class="edit-action-btn save" onclick="saveJson()">💾 저장</button>
+    <button class="edit-action-btn load" onclick="document.getElementById('load-json').click()">📂 불러오기</button>
+    <input type="file" id="load-json" accept=".json" style="display:none" onchange="loadJson(this)">
+  </div>
+</div>
+
+<script>
+let challenges = [];
+let kisuLabel = '';
+let subLabel = '';
+
+function togglePanel() {
+  document.getElementById('edit-panel').classList.toggle('open');
+}
+
+function addCh() {
+  const input = document.getElementById('new-ch-input');
+  const val = input.value.trim();
+  if (!val) return;
+  challenges.push(val);
+  input.value = '';
+  renderList();
+  renderEditList();
+}
+
+function removeCh(i) {
+  challenges.splice(i, 1);
+  renderList();
+  renderEditList();
+}
+
+function renderList() {
+  kisuLabel = document.getElementById('ed-kisu').value.trim();
+  subLabel  = document.getElementById('ed-sub').value.trim();
+
+  // header update
+  document.querySelector('.header-label').textContent = ['아크크 체험단', kisuLabel].filter(Boolean).join(' · ');
+  document.getElementById('header-sub').textContent = subLabel || '아래 챌린지 중에서 자유롭게 골라서 도전해봐요!';
+  document.getElementById('header-count').textContent = `총 ${challenges.length}개 챌린지`;
+
+  filterList(document.querySelector('.search-input')?.value || '');
+}
+
+function filterList(q) {
+  const grid  = document.getElementById('challenge-grid');
+  const empty = document.getElementById('empty-state');
+  const filtered = q ? challenges.filter(c => c.toLowerCase().includes(q.toLowerCase())) : challenges;
+  if (!filtered.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = filtered.map((c, i) => `
+    <div class="challenge-card">
+      <span class="challenge-num">${String(challenges.indexOf(c) + 1).padStart(2, '0')}</span>
+      <span class="challenge-name">${c}</span>
+    </div>`).join('');
+}
+
+function renderEditList() {
+  document.getElementById('edit-list').innerHTML = challenges.map((c, i) => `
+    <div class="edit-item">
+      <span>${i + 1}. ${c}</span>
+      <button class="btn-del" onclick="removeCh(${i})">✕</button>
+    </div>`).join('');
+}
+
+function saveJson() {
+  const state = { kisu: kisuLabel, sub: subLabel, challenges };
+  const a = document.createElement('a');
+  a.download = `아크크 ${kisuLabel || ''} 챌린지목록.json`;
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2)], {type:'application/json'}));
+  a.click();
+}
+
+function loadJson(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const s = JSON.parse(e.target.result);
+      challenges = s.challenges || [];
+      document.getElementById('ed-kisu').value = s.kisu || '';
+      document.getElementById('ed-sub').value  = s.sub  || '';
+      renderList();
+      renderEditList();
+    } catch { alert('파일을 불러오는 데 실패했어요.'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// init
+renderList();
+renderEditList();
+</script>
+</body>
+</html>
