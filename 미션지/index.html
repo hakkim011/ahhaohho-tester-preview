@@ -349,12 +349,23 @@ function seededRand(seed) {
   };
 }
 
-/* ── PATTERN BACKGROUND ── */
-function buildPattern(weekNum) {
-  const rand = seededRand(weekNum * 12345 + 9876);
+/* ── PATTERN BACKGROUND — Canvas API로 렌더링 (html2canvas 호환) ── */
+const patternCache = {};
+
+async function buildPatternDataUrl(weekNum) {
+  if (patternCache[weekNum]) return patternCache[weekNum];
+
   const W = 800, H = 2200;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#FEFEE8';
+  ctx.fillRect(0, 0, W, H);
+
+  const rand = seededRand(weekNum * 12345 + 9876);
   const cols = 7, rows = 14;
-  const svgParts = [];
+  const tasks = [];
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -363,32 +374,49 @@ function buildPattern(weekNum) {
       const shape = SHAPES[Math.floor(rand() * SHAPES.length)];
       const color = COLORS[Math.floor(rand() * COLORS.length)];
       const size  = 30 + rand() * 16;
-      const rot   = rand() * 360;
+      const rot   = rand() * Math.PI * 2;
       const vbParts = shape.vb.split(' ');
       const vbW = parseFloat(vbParts[2]);
       const vbH = parseFloat(vbParts[3]);
-      const scale = size / Math.max(vbW, vbH);
-      // nested SVG 없이 <g> transform만으로 처리 — 비율 왜곡 없음
-      svgParts.push(
-        `<g transform="translate(${cx} ${cy}) rotate(${rot}) scale(${scale}) translate(${-vbW/2} ${-vbH/2})">
-           <path d="${shape.d}" fill="${color}"/>
-         </g>`
-      );
+
+      // 모양 하나를 SVG img로 만들어 canvas에 그리기
+      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${shape.vb}"><path d="${shape.d}" fill="${color}"/></svg>`;
+      const imgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+
+      tasks.push(new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(rot);
+          ctx.drawImage(img, -size/2, -size/2, size, size);
+          ctx.restore();
+          resolve();
+        };
+        img.onerror = resolve;
+        img.src = imgUrl;
+      }));
     }
   }
 
-  const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
-    <rect width="${W}" height="${H}" fill="#FEFEE8"/>
-    ${svgParts.join('')}
-    <rect width="${W}" height="${H}" fill="rgba(254,254,232,0.78)"/>
-  </svg>`;
+  await Promise.all(tasks);
 
-  const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(fullSvg);
+  // 딤 오버레이
+  ctx.fillStyle = 'rgba(254,254,232,0.78)';
+  ctx.fillRect(0, 0, W, H);
+
+  const dataUrl = canvas.toDataURL('image/png');
+  patternCache[weekNum] = dataUrl;
+  return dataUrl;
+}
+
+async function buildPattern(weekNum) {
+  const dataUrl = await buildPatternDataUrl(weekNum);
   return `<img src="${dataUrl}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0" alt="">`;
 }
 
 /* ── RENDER CARD ── */
-function renderCard() {
+async function renderCard() {
   const kisu  = document.getElementById('in-kisu').value.trim();
   const week  = parseInt(document.getElementById('in-week').value);
   const data  = WEEK_DATA[week];
@@ -434,8 +462,9 @@ function renderCard() {
       </div>
     </div>`;
 
+  const patternHtml = await buildPattern(week);
   document.getElementById('mission-card').innerHTML = `
-    ${buildPattern(week)}
+    ${patternHtml}
     <div class="card-content">
       <div class="card-header">
         <span class="card-kisu">${kisuLabel}</span>
