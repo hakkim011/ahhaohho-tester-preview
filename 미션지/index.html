@@ -182,6 +182,11 @@
   }
   .mission-check svg { width: 12px; height: 12px; }
   .mission-text { font-size: 15px; font-weight: 700; color: var(--brand-black); }
+  .mission-hint {
+    display: block; margin-top: 5px;
+    font-size: 12px; font-weight: 600; font-style: italic;
+    color: rgba(11,18,21,0.45);
+  }
 
   /* challenge chips */
   .challenge-chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -456,13 +461,21 @@ async function renderCard() {
   const kisuLabel = ['아크크', kisu].filter(Boolean).join(' ');
   const weekLabel = `${week}주차`;
 
-  const missionsHtml = missions.map(m => `
+  const missionsHtml = missions.map(m => {
+    const match = m.match(/^(.*?)\s*\((.+)\)\s*$/);
+    const mainText = match ? match[1] : m;
+    const hintText = match ? match[2] : null;
+    return `
     <div class="mission-item">
       <div class="mission-check">
         <svg viewBox="0 0 12 9" fill="none"><path d="M1 4l3.5 3.5L11 1" stroke="#0B1215" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <span class="mission-text">${m}</span>
-    </div>`).join('');
+      <div>
+        <span class="mission-text">${mainText}</span>
+        ${hintText ? `<span class="mission-hint">💡 ${hintText}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
 
   const challengeHtml = data.isCh && challenges.length > 0 ? `
     <div class="card-section">
