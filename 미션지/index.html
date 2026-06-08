@@ -367,13 +367,12 @@ function buildPattern(weekNum) {
       const vbParts = shape.vb.split(' ');
       const vbW = parseFloat(vbParts[2]);
       const vbH = parseFloat(vbParts[3]);
-      // 정사각형 컨테이너 — 모든 모양을 동일한 크기로 통일
+      const scale = size / Math.max(vbW, vbH);
+      // nested SVG 없이 <g> transform만으로 처리 — 비율 왜곡 없음
       svgParts.push(
-        `<svg x="${cx - size/2}" y="${cy - size/2}" width="${size}" height="${size}" viewBox="${shape.vb}" preserveAspectRatio="xMidYMid meet">
-           <g transform="rotate(${rot},${vbW/2},${vbH/2})">
-             <path d="${shape.d}" fill="${color}"/>
-           </g>
-         </svg>`
+        `<g transform="translate(${cx} ${cy}) rotate(${rot}) scale(${scale}) translate(${-vbW/2} ${-vbH/2})">
+           <path d="${shape.d}" fill="${color}"/>
+         </g>`
       );
     }
   }
