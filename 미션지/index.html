@@ -363,16 +363,18 @@ async function buildPatternDataUrl(weekNum, H = 2200) {
   ctx.fillRect(0, 0, W, H);
 
   const rand = seededRand(weekNum * 12345 + 9876);
-  const cols = 7, rows = 14;
+  const cols = 5, rows = 9;
   const tasks = [];
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      const cx    = (c + 0.5) / cols * W + (rand() - 0.5) * 0.08 * W;
-      const cy    = (r + 0.5) / rows * H + (rand() - 0.5) * 0.08 * H;
+      // 지그재그: 짝수 행은 반 칸 오른쪽으로
+      const offset = (r % 2 === 0) ? 0 : (W / cols / 2);
+      const cx    = (c + 0.5) / cols * W + offset + (rand() - 0.5) * 0.04 * W;
+      const cy    = (r + 0.5) / rows * H                + (rand() - 0.5) * 0.04 * H;
       const shape = SHAPES[Math.floor(rand() * SHAPES.length)];
       const color = COLORS[Math.floor(rand() * COLORS.length)];
-      const size  = 30 + rand() * 16;
+      const size  = 28 + rand() * 10;
       const rot   = rand() * Math.PI * 2;
       const vbParts = shape.vb.split(' ');
       const vbW = parseFloat(vbParts[2]);
