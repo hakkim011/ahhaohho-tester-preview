@@ -510,7 +510,7 @@ async function renderCard() {
       <div>
         <span class="mission-text">${text}</span>
         ${hint ? `<span class="mission-hint">💡 ${hint}</span>` : ''}
-        ${where ? `<span class="mission-where"><img class="where-ahha" src="../../02_앱 리소스/아하오호 디자인 어셋/캐릭터 ver.2.0/썸네일 이미지/FAB(Ahha).svg" alt="아하"> ${where}</span>` : ''}
+        ${where ? `<span class="mission-where"><img class="where-ahha" src="FAB(Ahha).svg" alt="아하"> ${where}</span>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -636,7 +636,7 @@ function switchTab(tab) {
 async function renderFreeMissionCard() {
   const kisu = document.getElementById('in-kisu').value.trim();
   const kisuLabel = ['아크크', kisu].filter(Boolean).join(' ');
-  const ahhaImg = '../../02_앱 리소스/아하오호 디자인 어셋/캐릭터 ver.2.0/썸네일 이미지/FAB(Ahha).svg';
+  const ahhaImg = 'FAB(Ahha).svg';
 
   const card = document.getElementById('free-mission-card');
   card.innerHTML = `
