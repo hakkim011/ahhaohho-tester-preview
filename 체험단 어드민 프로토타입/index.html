@@ -132,7 +132,9 @@
   .btn-danger:hover { background: #fef2f2; }
 
   /* ── TABLE ── */
-  .table-wrap { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+  .table-wrap { border: 1px solid #e5e7eb; border-radius: 10px; overflow-x: auto; }
+  .table-wrap table { min-width: 680px; }
+  .table-wrap td, .table-wrap th { white-space: nowrap; }
   table { width: 100%; border-collapse: collapse; }
   thead tr { background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
   thead th {
@@ -559,7 +561,9 @@
                 <th>기수</th>
                 <th>상태</th>
                 <th>태깅일</th>
-                <th style="text-align:right">관리</th>
+                <th style="text-align:center">챌린지 시드</th>
+                <th style="text-align:center">자율 시드</th>
+                <th style="text-align:center">관리</th>
               </tr>
             </thead>
             <tbody id="member-tbody">
@@ -586,12 +590,17 @@
       <div class="cohort-filter-row" style="margin-bottom:12px">
         <button class="cohort-btn active" onclick="setPostType('', this)">전체</button>
         <button class="cohort-btn" onclick="setPostType('challenge', this)">챌린지</button>
-        <button class="cohort-btn" onclick="setPostType('free', this)">자율게시</button>
+        <button class="cohort-btn" onclick="setPostType('free', this)">자율창작</button>
       </div>
       <!-- 숨김 챌린지 필터값 저장용 (UI 없음) -->
       <input type="hidden" id="challenge-filter" value="">
 
       <div class="toolbar" style="margin-bottom:20px">
+        <!-- 시드 필터 (챌린지/자율창작 탭에서만 노출) -->
+        <div id="seed-filter-wrap" style="display:none; gap:6px;">
+          <button class="cohort-btn active" style="font-size:12px;padding:5px 12px" onclick="setSeedFilter('', this)">전체</button>
+          <button class="cohort-btn" style="font-size:12px;padding:5px 12px" onclick="setSeedFilter('seeded', this)">🌱 시드만</button>
+        </div>
         <select class="select-sm" id="post-sort" onchange="renderPosts()">
           <option value="desc">최신순</option>
           <option value="asc">오래된순</option>
@@ -1210,7 +1219,16 @@ function renderMembers(data) {
     return;
   }
   empty.style.display = 'none';
-  tbody.innerHTML = data.map(m => `
+  tbody.innerHTML = data.map(m => {
+    const chSeed = posts.filter(p => p.author === m.nickname && p.seedType === 'challenge').length;
+    const freeSeed = posts.filter(p => p.author === m.nickname && (p.seedType === 'idea' || p.seedType === 'free')).length;
+    const chSeedCell = chSeed > 0
+      ? `<span class="post-seed-badge seed-challenge" style="margin:0 auto">🌱 ${chSeed}</span>`
+      : `<span style="color:#d1d5db;font-size:13px">—</span>`;
+    const freeSeedCell = freeSeed > 0
+      ? `<span class="post-seed-badge seed-idea" style="margin:0 auto">🌱 ${freeSeed}</span>`
+      : `<span style="color:#d1d5db;font-size:13px">—</span>`;
+    return `
     <tr id="row-${m.id}">
       <td><strong>${m.name}</strong></td>
       <td style="color:#6b7280">${m.nickname}</td>
@@ -1218,14 +1236,16 @@ function renderMembers(data) {
       <td>${m.cohort}기</td>
       <td><span class="badge badge-${m.status}">${m.status === 'active' ? '활성' : '탈락'}</span></td>
       <td style="color:#9ca3af">${m.taggedAt}</td>
-      <td style="text-align:right">
+      <td style="text-align:center">${chSeedCell}</td>
+      <td style="text-align:center">${freeSeedCell}</td>
+      <td style="text-align:center;white-space:nowrap">
         ${m.status === 'active'
           ? `<button class="btn-danger" onclick="openDropConfirm(${m.id}, '${m.name}')">탈락 처리</button>`
-          : ``
+          : `<span style="color:#d1d5db;font-size:13px">—</span>`
         }
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
 /* ── 기수 버튼 필터 ── */
@@ -1522,18 +1542,31 @@ const CHALLENGES = [
   { id:'C003', name:'움직이는 장난감 만들기' },
   { id:'C004', name:'바람으로 움직이는 것 만들기' },
   { id:'C005', name:'물에 뜨는 배 만들기' },
+  { id:'C006', name:'빛으로 그림 그리기' },
+  { id:'C007', name:'소리 나는 오브제 만들기' },
+  { id:'C008', name:'나만의 캐릭터 인형 만들기' },
+  { id:'C009', name:'종이로 건축물 만들기' },
+  { id:'C010', name:'움직이는 모빌 만들기' },
+  { id:'C011', name:'자연 재료로 색 만들기' },
+  { id:'C012', name:'패턴으로 옷 디자인하기' },
 ];
 
 let postTypeFilter = '';
 let targetPostId = null;
+let seedFilter = '';
 
 function setPostType(val, btn) {
   postTypeFilter = val;
   document.querySelectorAll('#page-projects .cohort-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // 챌린지 탭에서는 테이블이 필터 역할 → 드롭다운 숨김
+  // 시드 필터 초기화
+  seedFilter = '';
+  const seedWrap = document.getElementById('seed-filter-wrap');
+  const showSeedFilter = val === 'challenge' || val === 'free';
+  seedWrap.style.display = showSeedFilter ? 'flex' : 'none';
+  seedWrap.querySelectorAll('.cohort-btn').forEach((b, i) => { b.classList.toggle('active', i === 0); });
+  // 챌린지 탭에서는 통계 테이블 노출
   const isCh = val === 'challenge';
-  document.getElementById('challenge-filter').style.display = 'none';
   document.getElementById('challenge-filter').value = '';
   document.getElementById('challenge-stats-row').style.display = isCh ? 'block' : 'none';
   if (isCh) {
@@ -1541,6 +1574,14 @@ function setPostType(val, btn) {
     if (s) s.value = '';
     renderChallengeStats();
   }
+  renderPosts();
+}
+
+/* 시드 필터 */
+function setSeedFilter(val, btn) {
+  seedFilter = val;
+  document.querySelectorAll('#seed-filter-wrap .cohort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   renderPosts();
 }
 
@@ -1587,6 +1628,7 @@ function renderPosts() {
   let data = [...posts];
   if (postTypeFilter) data = data.filter(p => p.type === postTypeFilter);
   if (challenge) data = data.filter(p => p.challengeId === challenge);
+  if (seedFilter === 'seeded') data = data.filter(p => p.seedType);
   data.sort((a, b) => sort === 'desc' ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date));
 
   const grid = document.getElementById('post-grid');
@@ -1597,7 +1639,7 @@ function renderPosts() {
   grid.innerHTML = data.map(p => {
     const typeBadge = p.type === 'challenge'
       ? `<span class="badge" style="background:#dbeafe;color:#1e40af;font-size:10px">챌린지</span>`
-      : `<span class="badge" style="background:#ede9fe;color:#6d28d9;font-size:10px">자율게시</span>`;
+      : `<span class="badge" style="background:#ede9fe;color:#6d28d9;font-size:10px">자율창작</span>`;
     const seedBadge = p.seedType
       ? `<div class="post-seed-badge seed-challenge">🌱 시드</div>`
       : '';
@@ -1624,7 +1666,7 @@ function renderPosts() {
           ${overlay}
         </div>
         <div class="post-body">
-          ${p.challenge ? `<div class="post-challenge">${p.challenge}</div>` : '<div class="post-challenge" style="color:#9ca3af">자율게시</div>'}
+          ${p.challenge ? `<div class="post-challenge">${p.challenge}</div>` : '<div class="post-challenge" style="color:#9ca3af">자율창작</div>'}
           <div class="post-author" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${p.author} ${testerBadge}</div>
           <div class="post-date">${p.date} · ID: ${p.id}</div>
           ${seedBadge}
@@ -1638,7 +1680,7 @@ function renderPosts() {
 function openSeedModal(postId) {
   targetPostId = postId;
   const p = posts.find(x => x.id === postId);
-  document.getElementById('seed-post-title').textContent = p.challenge || '자율게시';
+  document.getElementById('seed-post-title').textContent = p.challenge || '자율창작';
   document.getElementById('seed-post-meta').textContent = `${p.authorName} @${p.author} · ${p.date}`;
 
   const wrap = document.getElementById('challenge-select-wrap');
@@ -1675,11 +1717,11 @@ function openHideModal(postId, action) {
   targetPostId = postId;
   const p = posts.find(x => x.id === postId);
   if (action === 'hide') {
-    document.getElementById('hide-post-title').textContent = p.challenge || '자율게시';
+    document.getElementById('hide-post-title').textContent = p.challenge || '자율창작';
     document.getElementById('hide-post-meta').textContent = `${p.authorName} @${p.author} · ${p.date}`;
     openModal('modal-hide');
   } else {
-    document.getElementById('show-post-title').textContent = p.challenge || '자율게시';
+    document.getElementById('show-post-title').textContent = p.challenge || '자율창작';
     document.getElementById('show-post-meta').textContent = `${p.authorName} @${p.author} · ${p.date}`;
     openModal('modal-show');
   }
@@ -1698,7 +1740,7 @@ function confirmHide(action) {
 function openDeletePostModal(postId) {
   targetPostId = postId;
   const p = posts.find(x => x.id === postId);
-  document.getElementById('del-post-title').textContent = p.challenge || '자율게시';
+  document.getElementById('del-post-title').textContent = p.challenge || '자율창작';
   document.getElementById('del-post-meta').textContent = `${p.authorName} @${p.author} · ${p.date}`;
   openModal('modal-del-post');
 }
