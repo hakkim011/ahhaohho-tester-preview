@@ -562,7 +562,7 @@
                 <th>상태</th>
                 <th>태깅일</th>
                 <th style="text-align:center">챌린지 시드</th>
-                <th style="text-align:center">자율 시드</th>
+                <th style="text-align:center">자율창작 시드</th>
                 <th style="text-align:center">관리</th>
               </tr>
             </thead>
@@ -588,18 +588,18 @@
 
       <!-- 필터 -->
       <div class="cohort-filter-row" style="margin-bottom:12px">
-        <button class="cohort-btn active" onclick="setPostType('', this)">전체</button>
-        <button class="cohort-btn" onclick="setPostType('challenge', this)">챌린지</button>
+        <button class="cohort-btn active" onclick="setPostType('challenge', this)">챌린지</button>
         <button class="cohort-btn" onclick="setPostType('free', this)">자율창작</button>
       </div>
       <!-- 숨김 챌린지 필터값 저장용 (UI 없음) -->
       <input type="hidden" id="challenge-filter" value="">
 
       <div class="toolbar" style="margin-bottom:20px">
-        <!-- 시드 필터 (챌린지/자율창작 탭에서만 노출) -->
-        <div id="seed-filter-wrap" style="display:none; gap:6px;">
+        <!-- 시드 필터 + 총 개수 요약 -->
+        <div id="seed-filter-wrap" style="display:flex; gap:6px; align-items:center;">
           <button class="cohort-btn active" style="font-size:12px;padding:5px 12px" onclick="setSeedFilter('', this)">전체</button>
           <button class="cohort-btn" style="font-size:12px;padding:5px 12px" onclick="setSeedFilter('seeded', this)">🌱 시드만</button>
+          <span id="post-count-summary" style="font-size:12px;color:#6b7280;margin-left:4px"></span>
         </div>
         <select class="select-sm" id="post-sort" onchange="renderPosts()">
           <option value="desc">최신순</option>
@@ -895,17 +895,17 @@
   </div>
 </div>
 
-<!-- ── 탈락 처리 확인 모달 ── -->
+<!-- ── 탈락 확인 모달 ── -->
 <div class="modal-overlay" id="modal-drop-confirm">
   <div class="modal modal-sm">
-    <div class="modal-title">탈락 처리</div>
+    <div class="modal-title">탈락</div>
     <p class="modal-desc">
-      <strong id="drop-target-name"></strong>님을 탈락 처리하시겠습니까?<br>
+      <strong id="drop-target-name"></strong>님을 탈락하시겠습니까?<br>
       <span style="color:#dc2626">체험단 배지가 제거되며 되돌릴 수 없습니다.</span>
     </p>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-drop-confirm')">취소</button>
-      <button class="btn-primary" style="background:#dc2626" onclick="confirmDrop()">탈락 처리</button>
+      <button class="btn-primary" style="background:#dc2626" onclick="confirmDrop()">탈락</button>
     </div>
   </div>
 </div>
@@ -1240,7 +1240,7 @@ function renderMembers(data) {
       <td style="text-align:center">${freeSeedCell}</td>
       <td style="text-align:center;white-space:nowrap">
         ${m.status === 'active'
-          ? `<button class="btn-danger" onclick="openDropConfirm(${m.id}, '${m.name}')">탈락 처리</button>`
+          ? `<button class="btn-danger" onclick="openDropConfirm(${m.id}, '${m.name}')">탈락</button>`
           : `<span style="color:#d1d5db;font-size:13px">—</span>`
         }
       </td>
@@ -1316,7 +1316,7 @@ function addMember() {
   showToast(`${realName}을(를) 참여자로 추가했어요`);
 }
 
-/* ── 탈락 처리 ── */
+/* ── 탈락 ── */
 function openDropConfirm(id, name) {
   dropTargetId = id;
   document.getElementById('drop-target-name').textContent = name;
@@ -1330,7 +1330,7 @@ function confirmDrop() {
   closeModal('modal-drop-confirm');
   dropTargetId = null;
   filterMembers();
-  showToast(`${m ? m.name : '참여자'}을(를) 탈락 처리했어요`);
+  showToast(`${m ? m.name : '참여자'}을(를) 탈락했어요`);
 }
 
 /* ── 기수 추가 ── */
@@ -1527,13 +1527,13 @@ function switchPage(pageId, el) {
 
 /* ── 프로젝트 관리 데이터 ── */
 let posts = [
-  { id:'P001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',    author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#e0f2fe', emoji:'🎸' },
-  { id:'P002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isTester:true,  cohort:2, bg:'#fef3c7', emoji:'🏠' },
-  { id:'P003', type:'free',      challengeId:null,   challenge:null,                   author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden', seedType:null,       isTester:false, cohort:null, bg:'#fce7f3', emoji:'🚀' },
-  { id:'P004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal', seedType:null,       isTester:true,  cohort:1, bg:'#d1fae5', emoji:'🤖' },
-  { id:'P005', type:'free',      challengeId:null,   challenge:null,                   author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal', seedType:'idea',     isTester:true,  cohort:2, bg:'#ede9fe', emoji:'🌈' },
-  { id:'P006', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal', seedType:null,       isTester:false, cohort:null, bg:'#fff7ed', emoji:'🪁' },
-  { id:'P008', type:'free',      challengeId:null,   challenge:null,                   author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#fdf4ff', emoji:'🌸' },
+  { id:'P001', userId:'U001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',    author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#e0f2fe', emoji:'🎸' },
+  { id:'P002', userId:'U002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isTester:true,  cohort:2, bg:'#fef3c7', emoji:'🏠' },
+  { id:'P003', userId:'U003', type:'free',      challengeId:null,   challenge:null,                   author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden', seedType:null,       isTester:false, cohort:null, bg:'#fce7f3', emoji:'🚀' },
+  { id:'P004', userId:'U004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal', seedType:null,       isTester:true,  cohort:1, bg:'#d1fae5', emoji:'🤖' },
+  { id:'P005', userId:'U005', type:'free',      challengeId:null,   challenge:null,                   author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal', seedType:'idea',     isTester:true,  cohort:2, bg:'#ede9fe', emoji:'🌈' },
+  { id:'P006', userId:'U008', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal', seedType:null,       isTester:false, cohort:null, bg:'#fff7ed', emoji:'🪁' },
+  { id:'P008', userId:'U004', type:'free',      challengeId:null,   challenge:null,                   author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#fdf4ff', emoji:'🌸' },
 ];
 
 const CHALLENGES = [
@@ -1551,7 +1551,7 @@ const CHALLENGES = [
   { id:'C012', name:'패턴으로 옷 디자인하기' },
 ];
 
-let postTypeFilter = '';
+let postTypeFilter = 'challenge';
 let targetPostId = null;
 let seedFilter = '';
 
@@ -1562,8 +1562,7 @@ function setPostType(val, btn) {
   // 시드 필터 초기화
   seedFilter = '';
   const seedWrap = document.getElementById('seed-filter-wrap');
-  const showSeedFilter = val === 'challenge' || val === 'free';
-  seedWrap.style.display = showSeedFilter ? 'flex' : 'none';
+  seedWrap.style.display = 'flex';
   seedWrap.querySelectorAll('.cohort-btn').forEach((b, i) => { b.classList.toggle('active', i === 0); });
   // 챌린지 탭에서는 통계 테이블 노출
   const isCh = val === 'challenge';
@@ -1628,6 +1627,11 @@ function renderPosts() {
   let data = [...posts];
   if (postTypeFilter) data = data.filter(p => p.type === postTypeFilter);
   if (challenge) data = data.filter(p => p.challengeId === challenge);
+  // 총 개수 요약 (시드 필터 적용 전 기준)
+  const totalCount = data.length;
+  const seedCount = data.filter(p => p.seedType).length;
+  const summary = document.getElementById('post-count-summary');
+  if (summary) summary.textContent = `총 ${totalCount}개 · 시드 ${seedCount}개`;
   if (seedFilter === 'seeded') data = data.filter(p => p.seedType);
   data.sort((a, b) => sort === 'desc' ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date));
 
@@ -1668,7 +1672,7 @@ function renderPosts() {
         <div class="post-body">
           ${p.challenge ? `<div class="post-challenge">${p.challenge}</div>` : '<div class="post-challenge" style="color:#9ca3af">자율창작</div>'}
           <div class="post-author" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${p.author} ${testerBadge}</div>
-          <div class="post-date">${p.date} · ID: ${p.id}</div>
+          <div class="post-date">${p.date} · P: ${p.id} · U: ${p.userId}</div>
           ${seedBadge}
         </div>
         <div class="post-actions">${seedBtn}${hideBtn}${delBtn}</div>
