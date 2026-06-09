@@ -314,6 +314,60 @@
   .seed-challenge { background: #dcfce7; color: #166534; }
   .seed-idea { background: #fef9c3; color: #854d0e; }
 
+  .tester-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 10px; font-weight: 700; padding: 2px 6px;
+    border-radius: 4px; white-space: nowrap;
+  }
+  .tester-badge.is-tester { background: #fefce8; color: #854d0e; border: 1px solid #fde68a; }
+  .tester-badge.not-tester { background: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb; }
+
+  /* 챌린지별 통계 테이블 */
+  .challenge-stat-table-wrap {
+    border: 1px solid #e5e7eb; border-radius: 10px;
+    overflow: hidden; margin-bottom: 20px;
+    max-height: 260px; overflow-y: auto;
+  }
+  .challenge-stat-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .challenge-stat-table thead tr {
+    background: #f9fafb; border-bottom: 1px solid #e5e7eb;
+    position: sticky; top: 0; z-index: 1;
+  }
+  .challenge-stat-table th {
+    padding: 9px 14px; text-align: left;
+    font-size: 11px; font-weight: 700; color: #6b7280;
+    white-space: nowrap;
+  }
+  .challenge-stat-table th.col-num { text-align: center; }
+  .challenge-stat-table tbody tr {
+    border-bottom: 1px solid #f3f4f6; cursor: pointer;
+    transition: background 0.1s;
+  }
+  .challenge-stat-table tbody tr:last-child { border-bottom: none; }
+  .challenge-stat-table tbody tr:hover { background: #f9fafb; }
+  .challenge-stat-table tbody tr.ch-active { background: #fafaf0; }
+  .challenge-stat-table tbody tr.no-seed-row { background: #fff8f8; }
+  .challenge-stat-table tbody tr.no-seed-row:hover { background: #fff0f0; }
+  .challenge-stat-table tbody tr.no-seed-row.ch-active { background: #ffe8e8; }
+  .challenge-stat-table td {
+    padding: 10px 14px; color: #111827; vertical-align: middle;
+  }
+  .challenge-stat-table td.col-num { text-align: center; font-weight: 700; color: #374151; }
+  .challenge-stat-table td.col-name { font-weight: 600; }
+  .cst-seed-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 700; padding: 3px 8px;
+    border-radius: 100px; white-space: nowrap;
+  }
+  .cst-seed-badge.seed-ok { background: #dcfce7; color: #166534; }
+  .cst-seed-badge.seed-none { background: #fee2e2; color: #991b1b; }
+  .cst-active-indicator {
+    display: inline-block; width: 6px; height: 6px;
+    background: #111827; border-radius: 50%; margin-right: 6px; vertical-align: middle;
+  }
+
   .post-actions {
     display: flex; gap: 4px; padding: 8px 12px 12px; flex-wrap: wrap;
   }
@@ -534,20 +588,38 @@
         <button class="cohort-btn" onclick="setPostType('challenge', this)">챌린지</button>
         <button class="cohort-btn" onclick="setPostType('free', this)">자율게시</button>
       </div>
+      <!-- 숨김 챌린지 필터값 저장용 (UI 없음) -->
+      <input type="hidden" id="challenge-filter" value="">
+
       <div class="toolbar" style="margin-bottom:20px">
-        <!-- 챌린지 선택 (챌린지 탭 선택 시에만 노출) -->
-        <select class="select-sm" id="challenge-filter" onchange="renderPosts()" style="display:none">
-          <option value="">전체 챌린지</option>
-          <option value="C001">나만의 악기 만들기</option>
-          <option value="C002">재활용 재료로 집 짓기</option>
-          <option value="C003">움직이는 장난감 만들기</option>
-          <option value="C004">바람으로 움직이는 것 만들기</option>
-          <option value="C005">물에 뜨는 배 만들기</option>
-        </select>
         <select class="select-sm" id="post-sort" onchange="renderPosts()">
           <option value="desc">최신순</option>
           <option value="asc">오래된순</option>
         </select>
+      </div>
+
+      <!-- 챌린지별 통계 (챌린지 탭 선택 시 노출) -->
+      <div id="challenge-stats-row" style="display:none">
+        <div style="margin-bottom:8px">
+          <input class="form-input" type="text" id="challenge-search"
+            placeholder="챌린지 이름으로 검색..."
+            oninput="renderChallengeStats()"
+            style="max-width:320px; font-size:13px; padding:8px 12px;">
+        </div>
+        <div class="challenge-stat-table-wrap">
+          <table class="challenge-stat-table">
+            <thead>
+              <tr>
+                <th style="width:40px">#</th>
+                <th>챌린지</th>
+                <th class="col-num" style="width:80px">게시물</th>
+                <th class="col-num" style="width:60px">시드</th>
+                <th style="width:110px">시드 현황</th>
+              </tr>
+            </thead>
+            <tbody id="challenge-stat-chips"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- 게시물 그리드 -->
@@ -1435,13 +1507,21 @@ function switchPage(pageId, el) {
 
 /* ── 프로젝트 관리 데이터 ── */
 let posts = [
-  { id:'P001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',  author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal',  seedType:null,        bg:'#e0f2fe', emoji:'🎸' },
-  { id:'P002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',  authorName:'김지민', date:'2026.06.13', status:'normal',  seedType:'challenge',  bg:'#fef3c7', emoji:'🏠' },
-  { id:'P003', type:'free',      challengeId:null,   challenge:null,                 author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden',  seedType:null,        bg:'#fce7f3', emoji:'🚀' },
-  { id:'P004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal',  seedType:null,        bg:'#d1fae5', emoji:'🤖' },
-  { id:'P005', type:'free',      challengeId:null,   challenge:null,                 author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal',  seedType:'idea',      bg:'#ede9fe', emoji:'🌈' },
-  { id:'P006', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal',  seedType:null,        bg:'#fff7ed', emoji:'🪁' },
-  { id:'P008', type:'free',      challengeId:null,   challenge:null,                 author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal',  seedType:null,        bg:'#fdf4ff', emoji:'🌸' },
+  { id:'P001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',    author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#e0f2fe', emoji:'🎸' },
+  { id:'P002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isTester:true,  cohort:2, bg:'#fef3c7', emoji:'🏠' },
+  { id:'P003', type:'free',      challengeId:null,   challenge:null,                   author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden', seedType:null,       isTester:false, cohort:null, bg:'#fce7f3', emoji:'🚀' },
+  { id:'P004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal', seedType:null,       isTester:true,  cohort:1, bg:'#d1fae5', emoji:'🤖' },
+  { id:'P005', type:'free',      challengeId:null,   challenge:null,                   author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal', seedType:'idea',     isTester:true,  cohort:2, bg:'#ede9fe', emoji:'🌈' },
+  { id:'P006', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal', seedType:null,       isTester:false, cohort:null, bg:'#fff7ed', emoji:'🪁' },
+  { id:'P008', type:'free',      challengeId:null,   challenge:null,                   author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#fdf4ff', emoji:'🌸' },
+];
+
+const CHALLENGES = [
+  { id:'C001', name:'나만의 악기 만들기' },
+  { id:'C002', name:'재활용 재료로 집 짓기' },
+  { id:'C003', name:'움직이는 장난감 만들기' },
+  { id:'C004', name:'바람으로 움직이는 것 만들기' },
+  { id:'C005', name:'물에 뜨는 배 만들기' },
 ];
 
 let postTypeFilter = '';
@@ -1451,9 +1531,52 @@ function setPostType(val, btn) {
   postTypeFilter = val;
   document.querySelectorAll('#page-projects .cohort-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // 챌린지 탭일 때만 챌린지 필터 노출
-  document.getElementById('challenge-filter').style.display = val === 'challenge' ? 'inline-block' : 'none';
+  // 챌린지 탭에서는 테이블이 필터 역할 → 드롭다운 숨김
+  const isCh = val === 'challenge';
+  document.getElementById('challenge-filter').style.display = 'none';
   document.getElementById('challenge-filter').value = '';
+  document.getElementById('challenge-stats-row').style.display = isCh ? 'block' : 'none';
+  if (isCh) {
+    const s = document.getElementById('challenge-search');
+    if (s) s.value = '';
+    renderChallengeStats();
+  }
+  renderPosts();
+}
+
+/* 챌린지별 통계 테이블 렌더링 */
+function renderChallengeStats() {
+  const activeCh = document.getElementById('challenge-filter').value;
+  const query = (document.getElementById('challenge-search')?.value || '').trim().toLowerCase();
+  const filtered = query ? CHALLENGES.filter(ch => ch.name.toLowerCase().includes(query)) : CHALLENGES;
+  const tbody = document.getElementById('challenge-stat-chips');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:#9ca3af;font-size:13px">검색 결과 없음</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map((ch, i) => {
+    const chPosts = posts.filter(p => p.type === 'challenge' && p.challengeId === ch.id);
+    const total = chPosts.length;
+    const seeds = chPosts.filter(p => p.seedType).length;
+    const hasSeed = seeds > 0;
+    const isActive = activeCh === ch.id;
+    const rowCls = [isActive ? 'ch-active' : '', !hasSeed ? 'no-seed-row' : ''].filter(Boolean).join(' ');
+    return `
+      <tr class="${rowCls}" onclick="selectChallengeStat('${ch.id}')">
+        <td style="color:#9ca3af;font-size:12px;text-align:center">${i + 1}</td>
+        <td class="col-name">${isActive ? '<span class="cst-active-indicator"></span>' : ''}${ch.name}</td>
+        <td class="col-num">${total}</td>
+        <td class="col-num">${seeds}</td>
+        <td><span class="cst-seed-badge ${hasSeed ? 'seed-ok' : 'seed-none'}">${hasSeed ? '✅ 확보' : '⚠️ 미확보'}</span></td>
+      </tr>`;
+  }).join('');
+}
+
+/* 챌린지 칩 클릭 시 필터 토글 */
+function selectChallengeStat(challengeId) {
+  const filter = document.getElementById('challenge-filter');
+  filter.value = filter.value === challengeId ? '' : challengeId;
+  renderChallengeStats();
   renderPosts();
 }
 
@@ -1478,6 +1601,9 @@ function renderPosts() {
     const seedBadge = p.seedType
       ? `<div class="post-seed-badge seed-challenge">🌱 시드</div>`
       : '';
+    const testerBadge = p.isTester
+      ? `<span class="tester-badge is-tester">⭐ 체험단 ${p.cohort}기</span>`
+      : `<span class="tester-badge not-tester">일반 유저</span>`;
     const overlay = p.status === 'hidden'
       ? `<div class="post-thumb-overlay">숨겨짐</div>`
       : '';
@@ -1499,7 +1625,7 @@ function renderPosts() {
         </div>
         <div class="post-body">
           ${p.challenge ? `<div class="post-challenge">${p.challenge}</div>` : '<div class="post-challenge" style="color:#9ca3af">자율게시</div>'}
-          <div class="post-author">${p.author}</div>
+          <div class="post-author" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${p.author} ${testerBadge}</div>
           <div class="post-date">${p.date} · ID: ${p.id}</div>
           ${seedBadge}
         </div>
@@ -1540,6 +1666,7 @@ function confirmSeed() {
   p.seedType = p.type === 'challenge' ? 'challenge' : 'free';
   closeModal('modal-seed');
   renderPosts();
+  if (postTypeFilter === 'challenge') renderChallengeStats();
   showToast(`🌱 ${p.author}의 게시물을 시드 프로젝트로 지정했어요`);
 }
 
@@ -1587,6 +1714,7 @@ function unseed(postId) {
   const p = posts.find(x => x.id === postId);
   if (p) p.seedType = null;
   renderPosts();
+  if (postTypeFilter === 'challenge') renderChallengeStats();
   showToast(`${p ? p.author + '의 게시물' : '게시물'} 시드 지정을 해제했어요`);
 }
 
