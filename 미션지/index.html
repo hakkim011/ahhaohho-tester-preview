@@ -7,6 +7,7 @@
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -108,6 +109,19 @@
   .exp-btn-row .exp-btn { flex: 1; }
 
   /* ── PREVIEW ── */
+  .preview-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .preview-tabs {
+    display: flex; gap: 0; background: #111; flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 0 20px;
+  }
+  .preview-tab {
+    padding: 12px 18px; font-size: 13px; font-weight: 700;
+    color: rgba(255,255,255,0.35); cursor: pointer; border: none; background: none;
+    font-family: inherit; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: color .15s;
+  }
+  .preview-tab.active { color: var(--brand-neon); border-bottom-color: var(--brand-neon); }
   .preview-area {
     flex: 1; overflow: auto; background: #1a1a1a;
     display: flex; align-items: flex-start; justify-content: center; padding: 32px;
@@ -132,15 +146,15 @@
     margin-bottom: 40px;
   }
   .card-kisu {
-    font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700;
-    color: rgba(11,18,21,0.45); letter-spacing: .08em; text-transform: uppercase;
+    font-family: 'Pretendard', sans-serif; font-size: 13px; font-weight: 700;
+    color: rgba(11,18,21,0.6); letter-spacing: .04em;
   }
   .card-logo-img { height: 36px; opacity: 0.85; }
 
   /* week */
   .card-week-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
   .card-week-num {
-    font-family: 'Poppins', sans-serif; font-size: 72px; font-weight: 900;
+    font-family: 'Pretendard', sans-serif; font-size: 72px; font-weight: 900;
     color: var(--brand-black); line-height: 1; letter-spacing: -2px;
   }
   .card-week-label {
@@ -162,7 +176,7 @@
   /* mission section */
   .card-section { margin-bottom: 28px; }
   .card-section-title {
-    font-size: 14px; font-weight: 800; color: rgba(11,18,21,0.75);
+    font-size: 14px; font-weight: 800; color: var(--brand-black);
     letter-spacing: .04em;
     margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
   }
@@ -173,7 +187,7 @@
   .mission-item {
     display: flex; align-items: center; gap: 12px;
     background: white; border-radius: 12px; padding: 14px 18px;
-    box-shadow: 0 2px 8px rgba(11,18,21,0.05);
+    box-shadow: 0 4px 0 rgba(11,18,21,0.18);
   }
   .mission-check {
     width: 22px; height: 22px; border-radius: 50%;
@@ -184,17 +198,23 @@
   .mission-text { font-size: 15px; font-weight: 700; color: var(--brand-black); }
   .mission-hint {
     display: block; margin-top: 5px;
-    font-size: 12px; font-weight: 600; font-style: italic;
+    font-size: 13px; font-weight: 600; font-style: italic;
     color: rgba(11,18,21,0.45);
   }
+  .mission-where {
+    display: flex; align-items: flex-start; gap: 5px; margin-top: 8px;
+    font-family: 'Gamja Flower', cursive;
+    font-size: 14px; color: rgba(11,18,21,0.5); line-height: 1.4;
+  }
+  .mission-where img.where-ahha { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
 
   /* challenge chips */
   .challenge-chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .challenge-chip {
     display: inline-block; padding: 8px 16px;
-    background: white; border: 1.5px solid rgba(11,18,21,0.1);
+    background: var(--brand-neon); border: none;
     border-radius: 100px; font-size: 14px; font-weight: 700; color: var(--brand-black);
-    box-shadow: 0 2px 8px rgba(11,18,21,0.05);
+    box-shadow: 0 4px 0 rgba(11,18,21,0.15);
   }
 
   /* free missions */
@@ -202,12 +222,18 @@
     display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
   }
   .free-mission-item {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: flex-start; gap: 8px;
     background: white; border-radius: 10px; padding: 11px 14px;
-    font-size: 13px; font-weight: 600; color: rgba(11,18,21,0.7);
+    font-size: 15px; font-weight: 600; color: rgba(11,18,21,0.7);
     box-shadow: 0 2px 8px rgba(11,18,21,0.04);
   }
-  .free-mission-emoji { font-size: 16px; }
+  .free-mission-emoji { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .free-mission-body { display: flex; flex-direction: column; gap: 4px; line-height: 1.4; }
+  .free-mission-where {
+    font-size: 11px; font-weight: 700; color: rgba(11,18,21,0.35);
+    letter-spacing: .04em;
+  }
+  .free-mission-where .where-pin { color: var(--brand-black); }
 
   /* completion */
   .card-completion {
@@ -276,7 +302,7 @@
       <div id="challenge-section">
         <div class="sec-label">챌린지 목록</div>
         <div class="challenge-input-row">
-          <input type="text" id="ch-input" placeholder="챌린지명 입력" onkeydown="if(event.key==='Enter')addChallenge()">
+          <input type="text" id="ch-input" placeholder="챌린지명 입력" onkeydown="if(event.key==='Enter'&&!event.isComposing)addChallenge()">
           <button class="btn-add-ch" onclick="addChallenge()">+ 추가</button>
         </div>
         <div id="ch-tags"></div>
@@ -295,11 +321,22 @@
   </aside>
 
   <!-- ── 미리보기 ── -->
-  <main class="preview-area" id="preview-area">
-    <div class="card-scale-wrap" id="card-scale-wrap">
-      <div id="mission-card"></div>
+  <div class="preview-wrap">
+    <div class="preview-tabs">
+      <button class="preview-tab active" onclick="switchTab('card')">📋 미션지</button>
+      <button class="preview-tab" onclick="switchTab('free')">✨ 자유 미션 안내</button>
     </div>
-  </main>
+    <main class="preview-area" id="preview-area">
+      <!-- 미션지 탭 -->
+      <div id="tab-card" class="card-scale-wrap" style="transform-origin:top left">
+        <div id="mission-card"></div>
+      </div>
+      <!-- 자유 미션 안내 탭 -->
+      <div id="tab-free" style="display:none; width:800px">
+        <div id="free-mission-card"></div>
+      </div>
+    </main>
+  </div>
 
 </div>
 
@@ -320,50 +357,50 @@ const SHAPES = [
 
 const WEEK_DATA = {
   1: { theme:'챌린지', event:'#오리엔테이션', missions:[
-    '챌린지 리스트에 있는 챌린지 중 하나를 골라 완성하고 공유하기',
-    '친구 게시물에 댓글 3개 이상 달기',
-    '응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기',
+    { text:'이번 주 챌린지에 있는 챌린지 중 하나를 골라 완성하고 공유하기', where:'<strong>챌린지 화면</strong>에서 챌린지를 선택하거나 검색해서 시작할 수 있어!' },
+    { text:'다른 메이커 게시물에 댓글 3개 이상 달기', where:'<strong>갤러리 화면</strong>에서 게시물의 <strong>댓글 버튼을</strong> 눌러 작성할 수 있어!' },
+    { text:'응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기', where:'<strong>갤러리 화면</strong>에서 <strong>하트 버튼을</strong> 누르거나 1초간 꾸욱 눌러서 다양하게 반응할 수 있어!' },
   ], isCh:true },
   2: { theme:'챌린지', event:null, missions:[
-    '챌린지 리스트에 있는 챌린지 중 하나를 골라 완성하고 공유하기',
-    '친구 게시물에 댓글 3개 이상 달기',
-    '응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기',
+    { text:'이번 주 챌린지에 있는 챌린지 중 하나를 골라 완성하고 공유하기', where:'<strong>챌린지 화면</strong>에서 챌린지를 선택하거나 검색해서 시작할 수 있어!' },
+    { text:'다른 메이커 게시물에 댓글 3개 이상 달기', where:'<strong>갤러리 화면</strong>에서 게시물의 <strong>댓글 버튼을</strong> 눌러 작성할 수 있어!' },
+    { text:'응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기', where:'<strong>갤러리 화면</strong>에서 <strong>하트 버튼을</strong> 누르거나 1초간 꾸욱 눌러서 다양하게 반응할 수 있어!' },
   ], isCh:true },
   3: { theme:'챌린지', event:null, missions:[
-    '챌린지 리스트에 있는 챌린지 중 하나를 골라 완성하고 공유하기',
-    '친구 게시물에 댓글 3개 이상 달기',
-    '응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기',
+    { text:'이번 주 챌린지에 있는 챌린지 중 하나를 골라 완성하고 공유하기', where:'<strong>챌린지 화면</strong>에서 챌린지를 선택하거나 검색해서 시작할 수 있어!' },
+    { text:'다른 메이커 게시물에 댓글 3개 이상 달기', where:'<strong>갤러리 화면</strong>에서 게시물의 <strong>댓글 버튼을</strong> 눌러 작성할 수 있어!' },
+    { text:'응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기', where:'<strong>갤러리 화면</strong>에서 <strong>하트 버튼을</strong> 누르거나 1초간 꾸욱 눌러서 다양하게 반응할 수 있어!' },
   ], isCh:true },
   4: { theme:'프로필 자랑하기', event:'#1차 온라인 밋업', missions:[
-    '지금까지 모은 조각으로 나만의 프로필 꾸며보기',
-    "내 프로필 캡처해서 갤러리에서 '게시하기' 눌러 올리기 (게시물 설명에 내 캐릭터 이름이랑 특징도 같이 써봐!)",
+    { text:'지금까지 모은 조각으로 나만의 프로필 꾸며보기', where:'<strong>프로필 화면</strong>에서 조각을 선택해서 꾸밀 수 있어!' },
+    { text:'내 프로필 친구들에게 자랑하기', where:"<strong>갤러리 화면</strong>에서 <strong>'게시하기' 버튼을</strong> 눌러 올릴 수 있어. 게시물 설명에 내 캐릭터의 특징도 같이 써봐!" },
   ], isCh:false },
   5: { theme:'챌린지', event:null, missions:[
-    '챌린지 리스트에 있는 챌린지 중 하나를 골라 완성하고 공유하기',
-    '친구 게시물에 댓글 5개 이상 달기',
-    '응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기',
+    { text:'이번 주 챌린지에 있는 챌린지 중 하나를 골라 완성하고 공유하기', where:'<strong>챌린지 화면</strong>에서 챌린지를 선택하거나 검색해서 시작할 수 있어!' },
+    { text:'다른 메이커 게시물에 댓글 5개 이상 달기', where:'<strong>갤러리 화면</strong>에서 게시물의 <strong>댓글 버튼을</strong> 눌러 작성할 수 있어!' },
+    { text:'응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기', where:'<strong>갤러리 화면</strong>에서 <strong>하트 버튼을</strong> 누르거나 1초간 꾸욱 눌러서 다양하게 반응할 수 있어!' },
   ], isCh:true },
   6: { theme:'자유 창작', event:null, missions:[
-    "만들고 싶은 거 자유롭게 만들고 갤러리 화면의 '게시하기'를 눌러 공유하기",
-    '친구 게시물에 댓글 5개 이상 달기',
-    '응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기',
+    { text:'만들고 싶은 거 자유롭게 만들어서 갤러리에 올리기', where:"<strong>갤러리 화면</strong>에서 <strong>'게시하기' 버튼을</strong> 눌러봐! 이전에 만든 작품을 올려도 괜찮아." },
+    { text:'다른 메이커 게시물에 댓글 5개 이상 달기', where:'<strong>갤러리 화면</strong>에서 게시물의 <strong>댓글 버튼을</strong> 눌러 작성할 수 있어!' },
+    { text:'응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기', where:'<strong>갤러리 화면</strong>에서 <strong>하트 버튼을</strong> 누르거나 1초간 꾸욱 눌러서 다양하게 반응할 수 있어!' },
   ], isCh:false },
   7: { theme:'챌린지', event:null, missions:[
-    '챌린지 리스트에 있는 챌린지 중 하나를 골라 완성하고 공유하기',
-    '친구 게시물에 댓글 5개 이상 달기',
-    '응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기',
+    { text:'이번 주 챌린지에 있는 챌린지 중 하나를 골라 완성하고 공유하기', where:'<strong>챌린지 화면</strong>에서 챌린지를 선택하거나 검색해서 시작할 수 있어!' },
+    { text:'다른 메이커 게시물에 댓글 5개 이상 달기', where:'<strong>갤러리 화면</strong>에서 게시물의 <strong>댓글 버튼을</strong> 눌러 작성할 수 있어!' },
+    { text:'응원해주고 싶은 친구들의 게시물에 리액션 10번 이상 해보기', where:'<strong>갤러리 화면</strong>에서 <strong>하트 버튼을</strong> 누르거나 1초간 꾸욱 눌러서 다양하게 반응할 수 있어!' },
   ], isCh:true },
   8: { theme:'메이커 작품집 만들기', event:'#2차 온라인 밋업', missions:[
-    '그동안 만든 작품 더 잘 만들고 싶은 게 있으면 다듬어서 메이커 작품집 완성하기',
+    { text:'지금까지 만든 작품 다듬고 작품집 완성하기', where:'<strong>프로필 화면</strong>에서 지금까지 만든 작품을 확인하고 다듬을 수 있어!' },
   ], isCh:false },
 };
 
 const FREE_MISSIONS = [
-  { emoji:'🎨', text:"만들고 싶은 거 자유롭게 만들고 갤러리 화면의 '게시하기'를 눌러 공유하기" },
-  { emoji:'💬', text:'친구가 내 댓글에 답글을 달았다면 댓글에 답해보기' },
-  { emoji:'✨', text:'지금까지 모은 조각으로 나만의 프로필 꾸며보기' },
-  { emoji:'📝', text:'나를 표현할 한 줄 소개 써보거나 수정해보기' },
-  { emoji:'📂', text:'지금까지 만든 작품 이미지·영상과 설명 더 구체적으로 써보기' },
+  { emoji:'🎨', text:'만들고 싶은 거 자유롭게 만들어서 갤러리에 올려봐요', where:"<strong>갤러리 화면</strong>에서 <strong>'게시하기' 버튼을</strong> 눌러봐! 이전에 만든 작품을 올려도 괜찮아." },
+  { emoji:'💬', text:'댓글에 답글 달아봐요', where:'<strong>갤러리 화면</strong>에서 내 게시물에 달린 댓글을 확인하고 <strong>답글 버튼을</strong> 눌러봐!' },
+  { emoji:'✨', text:'조각으로 나만의 프로필 꾸며봐요', where:'<strong>프로필 화면</strong>에서 지금까지 모은 조각들로 내 캐릭터를 꾸밀 수 있어!' },
+  { emoji:'📝', text:'자기소개를 써보거나 수정해봐요', where:'<strong>프로필 화면</strong>에서 나를 소개하는 글을 처음 써보거나 고쳐봐!' },
+  { emoji:'📂', text:'이전에 만든 프로젝트를 다듬어봐요', where:'<strong>갤러리 화면</strong>에서 내 작품을 눌러 사진·영상이나 설명을 수정할 수 있어!' },
 ];
 
 /* ── STATE ── */
@@ -462,17 +499,18 @@ async function renderCard() {
   const weekLabel = `${week}주차`;
 
   const missionsHtml = missions.map(m => {
-    const match = m.match(/^(.*?)\s*\((.+)\)\s*$/);
-    const mainText = match ? match[1] : m;
-    const hintText = match ? match[2] : null;
+    const text = typeof m === 'string' ? m : m.text;
+    const where = typeof m === 'object' ? m.where : null;
+    const hint = typeof m === 'object' ? m.hint : null;
     return `
     <div class="mission-item">
       <div class="mission-check">
         <svg viewBox="0 0 12 9" fill="none"><path d="M1 4l3.5 3.5L11 1" stroke="#0B1215" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div>
-        <span class="mission-text">${mainText}</span>
-        ${hintText ? `<span class="mission-hint">💡 ${hintText}</span>` : ''}
+        <span class="mission-text">${text}</span>
+        ${hint ? `<span class="mission-hint">💡 ${hint}</span>` : ''}
+        ${where ? `<span class="mission-where"><img class="where-ahha" src="../../02_앱 리소스/아하오호 디자인 어셋/캐릭터 ver.2.0/썸네일 이미지/FAB(Ahha).svg" alt="아하"> ${where}</span>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -485,23 +523,14 @@ async function renderCard() {
       </div>
     </div>` : '';
 
-  const freeMissionsHtml = `
-    <div class="card-section">
-      <div class="card-section-title">✨ 더 하고 싶다면?</div>
-      <div class="free-mission-grid">
-        ${FREE_MISSIONS.map(f => `
-          <div class="free-mission-item">
-            <span class="free-mission-emoji">${f.emoji}</span>
-            <span>${f.text}</span>
-          </div>`).join('')}
-      </div>
-    </div>`;
+  // 더 하고 싶다면? 섹션은 별도 안내문으로 분리 (카드에서 제거)
+  // const freeMissionsHtml = FREE_MISSIONS 데이터 참고
 
   const completionHtml = `
     <div class="card-completion">
       <div class="completion-icon">🎉</div>
       <div>
-        <div class="completion-text-label">이번 주 미션 완료 후</div>
+        <div class="completion-text-label">이번 주 미션 ${missions.length}개 완료 후</div>
         <div class="completion-text">"{닉네임} ${weekLabel} 완료!"</div>
         <div class="completion-sub">단톡방에 외쳐주세요 💬</div>
       </div>
@@ -528,7 +557,6 @@ async function renderCard() {
         <div class="mission-list">${missionsHtml}</div>
       </div>
       ${challengeHtml}
-      ${freeMissionsHtml}
       ${completionHtml}
     </div>`;
 
@@ -555,12 +583,16 @@ function onWeekChange() {
 
 function renderMissionEditor() {
   const week = parseInt(document.getElementById('in-week').value);
-  document.getElementById('mission-items-editor').innerHTML = missions.map((m, i) => `
+  document.getElementById('mission-items-editor').innerHTML = missions.map((m, i) => {
+    const text = typeof m === 'string' ? m : m.text;
+    const where = typeof m === 'object' ? (m.where || '') : '';
+    return `
     <div class="mission-item-row">
-      <input value="${m}" oninput="missions[${i}]=this.value;renderCard()">
+      <input value="${text}" oninput="missions[${i}]={...missions[${i}],text:this.value};renderCard()">
       <button class="btn-del-m" onclick="missions.splice(${i},1);renderMissionEditor();renderCard()">✕</button>
-    </div>`).join('') +
-    `<button class="btn-add-ch" style="margin-top:6px;width:100%" onclick="missions.push('새 미션');renderMissionEditor();renderCard()">+ 미션 추가</button>`;
+    </div>`;
+  }).join('') +
+    `<button class="btn-add-ch" style="margin-top:6px;width:100%" onclick="missions.push({text:'새 미션',where:''});renderMissionEditor();renderCard()">+ 미션 추가</button>`;
 }
 
 function renderChallengeSection() {
@@ -591,10 +623,60 @@ function renderChallengeTags() {
     <span class="ch-tag">${c}<button onclick="removeChallenge(${i})">✕</button></span>`).join('');
 }
 
+/* ── TAB ── */
+function switchTab(tab) {
+  document.querySelectorAll('.preview-tab').forEach((el, i) => {
+    el.classList.toggle('active', (tab === 'card' && i === 0) || (tab === 'free' && i === 1));
+  });
+  document.getElementById('tab-card').style.display = tab === 'card' ? '' : 'none';
+  document.getElementById('tab-free').style.display = tab === 'free' ? '' : 'none';
+  if (tab === 'free') renderFreeMissionCard();
+}
+
+async function renderFreeMissionCard() {
+  const kisu = document.getElementById('in-kisu').value.trim();
+  const kisuLabel = ['아크크', kisu].filter(Boolean).join(' ');
+  const ahhaImg = '../../02_앱 리소스/아하오호 디자인 어셋/캐릭터 ver.2.0/썸네일 이미지/FAB(Ahha).svg';
+
+  const card = document.getElementById('free-mission-card');
+  card.innerHTML = `
+    <div style="position:relative;width:800px;background:#FEFEE8;font-family:'Pretendard',sans-serif;overflow:hidden">
+      <img id="free-pattern-img" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0" alt="">
+      <div style="position:relative;z-index:2;padding:52px 52px 60px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:40px">
+          <span style="font-size:13px;font-weight:700;color:rgba(11,18,21,0.6);letter-spacing:.04em">${kisuLabel}</span>
+          <img style="height:36px;opacity:0.85" src="../메이커작품집/Logo1.svg" onerror="this.style.display='none'">
+        </div>
+        <div style="font-size:28px;font-weight:900;color:#0B1215;letter-spacing:-0.5px;margin-bottom:6px">더 하고 싶다면?</div>
+        <div style="font-size:14px;font-weight:500;color:rgba(11,18,21,0.45);margin-bottom:36px">미션 완료 후 여유가 있을 때 도전해봐요!</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          ${FREE_MISSIONS.map(f => `
+            <div style="display:flex;align-items:flex-start;gap:14px;background:white;border-radius:12px;padding:16px 20px;box-shadow:0 4px 0 rgba(11,18,21,0.12)">
+              <span style="font-size:22px;flex-shrink:0;margin-top:2px">${f.emoji}</span>
+              <div>
+                <div style="font-size:15px;font-weight:600;color:#0B1215;line-height:1.4">${f.text}</div>
+                ${f.where ? `
+                <div style="display:flex;align-items:flex-start;gap:5px;margin-top:8px;font-family:'Gamja Flower',cursive;font-size:14px;color:rgba(11,18,21,0.5);line-height:1.4">
+                  <img src="${ahhaImg}" style="width:16px;height:16px;flex-shrink:0;margin-top:1px" alt="아하">
+                  <span>${f.where}</span>
+                </div>` : ''}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+
+  const cardEl = card.firstElementChild;
+  const H = cardEl.scrollHeight;
+  const dataUrl = await buildPatternDataUrl(1, H);
+  const patternImg = document.getElementById('free-pattern-img');
+  if (patternImg) patternImg.src = dataUrl;
+}
+
 /* ── SCALE ── */
 function scaleCard() {
   const area = document.getElementById('preview-area');
-  const wrap = document.getElementById('card-scale-wrap');
+  const wrap = document.getElementById('tab-card');
   const card = document.getElementById('mission-card');
   const availW = area.clientWidth - 64;
   const scale = Math.min(availW / 800, 1);
