@@ -781,16 +781,25 @@
       <input class="form-input" type="text" placeholder="닉네임 또는 전화번호 입력" oninput="searchUser(this.value)" id="user-search-input">
       <p class="form-hint">2글자 이상 입력하면 검색됩니다</p>
       <div class="search-results" id="search-results">
-        <div class="search-result-item" onclick="selectUser(this, '우주탐험가', '+821012345678')">
-          <span class="search-result-name">우주탐험가</span>
+        <div class="search-result-item" onclick="selectUser(this, '우주탐험가', '+821012345678', '이희준')">
+          <div>
+            <span class="search-result-name">우주탐험가</span>
+            <span style="font-size:12px;color:#374151;margin-left:6px">이희준</span>
+          </div>
           <span class="search-result-phone">+82 10-1234-5678</span>
         </div>
-        <div class="search-result-item" onclick="selectUser(this, '별빛소년', '+821098765432')">
-          <span class="search-result-name">별빛소년</span>
+        <div class="search-result-item" onclick="selectUser(this, '별빛소년', '+821098765432', '김지민')">
+          <div>
+            <span class="search-result-name">별빛소년</span>
+            <span style="font-size:12px;color:#374151;margin-left:6px">김지민</span>
+          </div>
           <span class="search-result-phone">+82 10-9876-5432</span>
         </div>
-        <div class="search-result-item" onclick="selectUser(this, '로켓제작자', '+821055554444')">
-          <span class="search-result-name">로켓제작자</span>
+        <div class="search-result-item" onclick="selectUser(this, '로켓제작자', '+821055554444', '박서연')">
+          <div>
+            <span class="search-result-name">로켓제작자</span>
+            <span style="font-size:12px;color:#374151;margin-left:6px">박서연</span>
+          </div>
           <span class="search-result-phone">+82 10-5555-4444</span>
         </div>
       </div>
@@ -1282,15 +1291,16 @@ function searchUser(val) {
   }
 }
 
-function selectUser(el, name, phone) {
+function selectUser(el, nickname, phone, realName) {
   document.querySelectorAll('.search-result-item').forEach(i => i.classList.remove('selected'));
   el.classList.add('selected');
-  selectedUser = { name, phone };
-  document.getElementById('user-search-input').value = name;
+  selectedUser = { name: nickname, phone };
+  document.getElementById('user-search-input').value = nickname;
   document.getElementById('search-results').classList.remove('show');
-  document.getElementById('selected-name').textContent = name;
+  document.getElementById('selected-name').textContent = nickname;
   document.getElementById('selected-phone').textContent = phone;
   document.getElementById('selected-user-info').style.display = 'block';
+  if (realName) document.getElementById('input-realname').value = realName;
 }
 
 /* ── 참여자 추가 ── */
