@@ -306,6 +306,11 @@
   .post-author { font-size: 13px; font-weight: 700; color: #050505; }
   .post-author-nick { font-weight: 400; color: #9ca3af; font-size: 12px; }
   .post-date { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+  .post-content {
+    font-size: 12px; color: #6b7280; margin-top: 4px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; line-height: 1.5;
+  }
 
   .post-seed-badge {
     display: inline-flex; align-items: center; gap: 3px;
@@ -426,6 +431,18 @@
     white-space: nowrap; z-index: 9999;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── 본문 툴팁 ── */
+  .content-tooltip {
+    position: fixed; z-index: 500;
+    background: white; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 12px 14px;
+    width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    font-size: 13px; color: #374151; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+  }
+  .content-tooltip.show { opacity: 1; }
 
   /* prototype label */
   .proto-label {
@@ -1122,6 +1139,7 @@
   </div>
 </div>
 
+<div class="content-tooltip" id="content-tooltip"></div>
 <div class="toast" id="toast"></div>
 <div class="proto-label">프로토타입</div>
 
@@ -1538,13 +1556,14 @@ function switchPage(pageId, el) {
 
 /* ── 프로젝트 관리 데이터 ── */
 let posts = [
-  { id:'P001', userId:'U001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',    author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#e0f2fe', emoji:'🎸' },
-  { id:'P002', userId:'U002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isTester:true,  cohort:2, bg:'#fef3c7', emoji:'🏠' },
-  { id:'P003', userId:'U003', type:'free',      challengeId:null,   challenge:null,                   author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden', seedType:null,       isTester:false, cohort:null, bg:'#fce7f3', emoji:'🚀' },
-  { id:'P004', userId:'U004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal', seedType:null,       isTester:true,  cohort:1, bg:'#d1fae5', emoji:'🤖' },
-  { id:'P005', userId:'U005', type:'free',      challengeId:null,   challenge:null,                   author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal', seedType:'idea',     isTester:true,  cohort:2, bg:'#ede9fe', emoji:'🌈' },
-  { id:'P006', userId:'U008', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal', seedType:null,       isTester:false, cohort:null, bg:'#fff7ed', emoji:'🪁' },
-  { id:'P008', userId:'U004', type:'free',      challengeId:null,   challenge:null,                   author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#fdf4ff', emoji:'🌸' },
+  { id:'P001', userId:'U001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',    author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#e0f2fe', emoji:'🎸', visibility:'public',  content:'페트병이랑 빨대로 악기를 만들어봤어요! 불면 소리가 나요.' },
+  { id:'P002', userId:'U002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isTester:true,  cohort:2, bg:'#fef3c7', emoji:'🏠', visibility:'public',  content:'우유팩 여러 개를 붙여서 2층 집을 만들었어요. 지붕도 만들었는데 진짜 비도 막을 수 있을 것 같아요.' },
+  { id:'P003', userId:'U003', type:'free',      challengeId:null,   challenge:null,                   author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden', seedType:null,       isTester:false, cohort:null, bg:'#fce7f3', emoji:'🚀', visibility:'public',  content:'제가 만든 로켓이에요. 발사 버튼도 달았어요!' },
+  { id:'P004', userId:'U004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal', seedType:null,       isTester:true,  cohort:1, bg:'#d1fae5', emoji:'🤖', visibility:'public',  content:'고무줄 동력으로 움직이는 로봇을 만들었어요. 태엽을 감으면 앞으로 걸어가요.' },
+  { id:'P005', userId:'U005', type:'free',      challengeId:null,   challenge:null,                   author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal', seedType:'idea',     isTester:true,  cohort:2, bg:'#ede9fe', emoji:'🌈', visibility:'public',  content:'색종이로 태양계 행성을 다 만들었어요. 토성 고리가 제일 어려웠어요.' },
+  { id:'P006', userId:'U008', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal', seedType:null,       isTester:false, cohort:null, bg:'#fff7ed', emoji:'🪁', visibility:'public',  content:'선풍기 바람으로 움직이는 돛단배를 만들었어요.' },
+  { id:'P007', userId:'U006', type:'free',      challengeId:null,   challenge:null,                   author:'은하수메이커', authorName:'윤태양', date:'2026.06.11', status:'normal', seedType:null,      isTester:true,  cohort:1, bg:'#fef9c3', emoji:'⭐', visibility:'private', content:'나만 보는 작품이에요.' },
+  { id:'P008', userId:'U004', type:'free',      challengeId:null,   challenge:null,                   author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#fdf4ff', emoji:'🌸', visibility:'public',  content:'꽃잎을 관찰하고 그림으로 그려봤어요. 꽃마다 모양이 다 달라서 신기했어요.' },
 ];
 
 const CHALLENGES = [
@@ -1634,7 +1653,7 @@ function renderPosts() {
   const sort      = document.getElementById('post-sort').value;
   const challenge = document.getElementById('challenge-filter').value;
 
-  let data = [...posts];
+  let data = [...posts].filter(p => p.visibility !== 'private');
   if (postTypeFilter) data = data.filter(p => p.type === postTypeFilter);
   if (challenge) data = data.filter(p => p.challengeId === challenge);
   // 총 개수 요약 (시드 필터 적용 전 기준)
@@ -1679,15 +1698,37 @@ function renderPosts() {
           <div class="post-badges">${typeBadge}</div>
           ${overlay}
         </div>
-        <div class="post-body">
+        <div class="post-body" ${p.content ? `onmouseenter="startContentTooltip(event,'${p.id}')" onmouseleave="hideContentTooltip()"` : ''}>
           ${p.challenge ? `<div class="post-challenge">${p.challenge}</div>` : '<div class="post-challenge" style="color:#9ca3af">자율창작</div>'}
           <div class="post-author" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${p.author} ${testerBadge}</div>
           <div class="post-date">${p.date} · P: ${p.id} · U: ${p.userId}</div>
+          ${p.content ? `<div class="post-content">${p.content}</div>` : ''}
           ${seedBadge}
         </div>
         <div class="post-actions">${seedBtn}${hideBtn}${delBtn}</div>
       </div>`;
   }).join('');
+}
+
+/* ── 본문 툴팁 ── */
+let tooltipTimer = null;
+function startContentTooltip(e, postId) {
+  hideContentTooltip();
+  tooltipTimer = setTimeout(() => {
+    const p = posts.find(x => x.id === postId);
+    if (!p || !p.content) return;
+    const el = document.getElementById('content-tooltip');
+    el.textContent = p.content;
+    const x = e.clientX + 12;
+    const y = e.clientY + 12;
+    el.style.left = Math.min(x, window.innerWidth - 280) + 'px';
+    el.style.top  = Math.min(y, window.innerHeight - 160) + 'px';
+    el.classList.add('show');
+  }, 1000);
+}
+function hideContentTooltip() {
+  clearTimeout(tooltipTimer);
+  document.getElementById('content-tooltip').classList.remove('show');
 }
 
 /* ── 시드 지정 ── */
