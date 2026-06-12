@@ -1557,7 +1557,7 @@ function switchPage(pageId, el) {
 /* ── 프로젝트 관리 데이터 ── */
 let posts = [
   { id:'P001', userId:'U001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',    author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#e0f2fe', emoji:'🎸', visibility:'public',  content:'페트병이랑 빨대로 악기를 만들어봤어요! 불면 소리가 나요.' },
-  { id:'P002', userId:'U002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isTester:true,  cohort:2, bg:'#fef3c7', emoji:'🏠', visibility:'public',  content:'우유팩 여러 개를 붙여서 2층 집을 만들었어요. 지붕도 만들었는데 진짜 비도 막을 수 있을 것 같아요.' },
+  { id:'P002', userId:'U002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isTester:true,  cohort:2, bg:'#fef3c7', emoji:'🏠', visibility:'public',  content:'우유팩 여러 개를 붙여서 2층 집을 만들었어요. 지붕도 만들었는데 진짜 비도 막을 수 있을 것 같아요. 창문도 뚫고 문도 달았는데 진짜 집처럼 보여서 너무 뿌듯했어요. 다음엔 3층도 만들어보고 싶어요!' },
   { id:'P003', userId:'U003', type:'free',      challengeId:null,   challenge:null,                   author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden', seedType:null,       isTester:false, cohort:null, bg:'#fce7f3', emoji:'🚀', visibility:'public',  content:'제가 만든 로켓이에요. 발사 버튼도 달았어요!' },
   { id:'P004', userId:'U004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal', seedType:null,       isTester:true,  cohort:1, bg:'#d1fae5', emoji:'🤖', visibility:'public',  content:'고무줄 동력으로 움직이는 로봇을 만들었어요. 태엽을 감으면 앞으로 걸어가요.' },
   { id:'P005', userId:'U005', type:'free',      challengeId:null,   challenge:null,                   author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal', seedType:'idea',     isTester:true,  cohort:2, bg:'#ede9fe', emoji:'🌈', visibility:'public',  content:'색종이로 태양계 행성을 다 만들었어요. 토성 고리가 제일 어려웠어요.' },
@@ -1698,7 +1698,7 @@ function renderPosts() {
           <div class="post-badges">${typeBadge}</div>
           ${overlay}
         </div>
-        <div class="post-body" ${p.content ? `onmouseenter="startContentTooltip(event,'${p.id}')" onmouseleave="hideContentTooltip()"` : ''}>
+        <div class="post-body" ${p.content ? `onmouseenter="startContentTooltip(event,this,'${p.id}')" onmouseleave="hideContentTooltip()"` : ''}>
           ${p.challenge ? `<div class="post-challenge">${p.challenge}</div>` : '<div class="post-challenge" style="color:#9ca3af">자율창작</div>'}
           <div class="post-author" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${p.author} ${testerBadge}</div>
           <div class="post-date">${p.date} · P: ${p.id} · U: ${p.userId}</div>
@@ -1712,8 +1712,10 @@ function renderPosts() {
 
 /* ── 본문 툴팁 ── */
 let tooltipTimer = null;
-function startContentTooltip(e, postId) {
+function startContentTooltip(e, bodyEl, postId) {
   hideContentTooltip();
+  const contentEl = bodyEl.querySelector('.post-content');
+  if (!contentEl || contentEl.scrollHeight <= contentEl.clientHeight) return;
   tooltipTimer = setTimeout(() => {
     const p = posts.find(x => x.id === postId);
     if (!p || !p.content) return;
