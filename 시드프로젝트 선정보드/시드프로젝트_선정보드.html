@@ -480,7 +480,7 @@ function saveToFile() {
     dateStart: document.getElementById('in-date-start').value,
     dateEnd:   document.getElementById('in-date-end').value,
     cards:     cards.map(c => ({
-      id: c.id, name: c.name, curation: c.curation, challenge: c.challenge, reason: c.reason,
+      id: c.id, name: c.name, challenge: c.challenge, reason: c.reason,
       image: c.image || null   // base64 포함
     })),
   };
@@ -510,7 +510,7 @@ function loadFromFile(input) {
       // 카드 복원
       cards = (state.cards || []).map(c => ({
         id: c.id || Date.now() + Math.random(),
-        name: c.name || '', curation: c.curation || '', challenge: c.challenge || '',
+        name: c.name || '', challenge: c.challenge || '',
         reason: c.reason || '', image: c.image || null,
       }));
       nextId = cards.length ? Math.max(...cards.map(c => c.id)) + 1 : 1;
@@ -561,7 +561,7 @@ function getInfo() {
 /* ── CARD ACTIONS ── */
 function addCard() {
   const id = nextId++;
-  cards.push({ id, image: null, name: '', curation: '', challenge: '', reason: '' });
+  cards.push({ id, image: null, name: '', challenge: '', reason: '' });
   renderEditorCards();
   render();
 }
@@ -578,7 +578,7 @@ function updateCard(id, field, value) {
 }
 
 function updateCounter(id, field, value) {
-  const limits = { name: 10, curation: 20, challenge: 20, reason: 60 };
+  const limits = { name: 10, challenge: 20, reason: 60 };
   const max = limits[field];
   const el = document.getElementById(`counter-${field}-${id}`);
   if (!el) return;
@@ -628,11 +628,6 @@ function renderEditorCards() {
           value="${escHtml(card.name)}"
           oninput="updateCard(${card.id},'name',this.value);updateCounter(${card.id},'name',this.value)">
         <div class="reason-counter" id="counter-name-${card.id}">${card.name.length}/10</div>
-        <input class="card-name-in" type="text" placeholder="큐레이션명 (예: 봄 큐레이션)" maxlength="20"
-          style="font-weight:400"
-          value="${escHtml(card.curation)}"
-          oninput="updateCard(${card.id},'curation',this.value);updateCounter(${card.id},'curation',this.value)">
-        <div class="reason-counter" id="counter-curation-${card.id}">${(card.curation||'').length}/20</div>
         <input class="card-name-in" type="text" placeholder="챌린지명 (예: 바다 챌린지)" maxlength="20"
           style="font-weight:400"
           value="${escHtml(card.challenge)}"
@@ -660,7 +655,7 @@ function cardHtml(card) {
       </div>
       <div class="b-card-body">
         <div class="b-card-name">${escHtml(card.name) || '이름'}</div>
-        ${(card.curation || card.challenge) ? `<div><span class="b-card-tag">${[card.curation, card.challenge].filter(Boolean).map(escHtml).join(' > ')}</span></div>` : ''}
+        ${card.challenge ? `<div><span class="b-card-tag">${escHtml(card.challenge)}</span></div>` : ''}
         <div class="b-card-reason">${escHtml(card.reason)}</div>
       </div>
     </div>`;
