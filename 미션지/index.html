@@ -302,6 +302,9 @@
       <div id="challenge-section">
         <div class="sec-label">챌린지 목록</div>
         <div class="challenge-input-row">
+          <input type="text" id="ch-curation-input" placeholder="큐레이션명 (선택)" style="flex:1">
+        </div>
+        <div class="challenge-input-row">
           <input type="text" id="ch-input" placeholder="챌린지명 입력" onkeydown="if(event.key==='Enter'&&!event.isComposing)addChallenge()">
           <button class="btn-add-ch" onclick="addChallenge()">+ 추가</button>
         </div>
@@ -519,7 +522,10 @@ async function renderCard() {
     <div class="card-section">
       <div class="card-section-title">🎯 이번 주 챌린지</div>
       <div class="challenge-chips">
-        ${challenges.map(c => `<span class="challenge-chip">${c}</span>`).join('')}
+        ${challenges.map(c => {
+          const label = typeof c === 'string' ? c : [c.curation, c.name].filter(Boolean).join(' > ');
+          return `<span class="challenge-chip">${label}</span>`;
+        }).join('')}
       </div>
     </div>` : '';
 
@@ -603,10 +609,13 @@ function renderChallengeSection() {
 }
 
 function addChallenge() {
+  const curationInput = document.getElementById('ch-curation-input');
   const input = document.getElementById('ch-input');
-  const val = input.value.trim();
-  if (!val) return;
-  challenges.push(val);
+  const curation = curationInput.value.trim();
+  const name = input.value.trim();
+  if (!name) return;
+  challenges.push({ curation, name });
+  curationInput.value = '';
   input.value = '';
   renderChallengeTags();
   renderCard();
@@ -619,8 +628,10 @@ function removeChallenge(i) {
 }
 
 function renderChallengeTags() {
-  document.getElementById('ch-tags').innerHTML = challenges.map((c, i) => `
-    <span class="ch-tag">${c}<button onclick="removeChallenge(${i})">✕</button></span>`).join('');
+  document.getElementById('ch-tags').innerHTML = challenges.map((c, i) => {
+    const label = typeof c === 'string' ? c : [c.curation, c.name].filter(Boolean).join(' > ');
+    return `<span class="ch-tag">${label}<button onclick="removeChallenge(${i})">✕</button></span>`;
+  }).join('');
 }
 
 /* ── TAB ── */
