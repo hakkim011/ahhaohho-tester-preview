@@ -620,6 +620,10 @@ function renderMissionEditor() {
     `<button class="btn-add-ch" style="margin-top:6px;width:100%" onclick="missions.push({text:'새 미션',where:''});renderMissionEditor();renderCard()">+ 미션 추가</button>`;
 }
 
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function renderChallengeSection() {
   const week = parseInt(document.getElementById('in-week').value);
   const sec = document.getElementById('challenge-section');
