@@ -458,7 +458,7 @@
   }
 
   .modal-close {
-    position: fixed;      /* 화면 고정 — 스크롤 무관 */
+    position: absolute;
     top: 20px;
     right: 24px;
     width: 40px;
@@ -496,6 +496,31 @@
   }
   .modal-desc { font-size: 15px; color: var(--text-sub); line-height: 1.8; margin-bottom: 20px; }
   .modal-date { font-size: 13px; color: #bbb; }
+
+  /* ─────────────────────────────
+     토스트
+  ───────────────────────────── */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: rgba(11,18,21,0.88);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 100px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 9999;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 
   /* ─────────────────────────────
      PDF 저장 버튼
@@ -909,6 +934,7 @@
 
 <!-- ── PDF 저장 버튼 ── -->
 <button class="print-btn" onclick="savePDF()">📄 PDF로 저장</button>
+<div class="toast" id="toast"></div>
 
 <!-- ── MODAL ── -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
@@ -1054,9 +1080,16 @@
 </script>
 
 <script>
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
 function savePDF() {
   if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    alert('PDF 저장은 PC 웹에서만 사용할 수 있어요.');
+    showToast('PDF 저장은 PC 웹에서만 사용할 수 있어요');
     return;
   }
   window.print();
