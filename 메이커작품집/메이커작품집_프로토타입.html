@@ -908,7 +908,7 @@
 </div>
 
 <!-- ── PDF 저장 버튼 ── -->
-<button class="print-btn" onclick="window.print()">📄 PDF로 저장</button>
+<button class="print-btn" onclick="savePDF()">📄 PDF로 저장</button>
 
 <!-- ── MODAL ── -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
@@ -1053,5 +1053,14 @@
   });
 </script>
 
+<script>
+function savePDF() {
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    alert('PDF 저장은 PC 웹에서만 사용할 수 있어요.');
+    return;
+  }
+  window.print();
+}
+</script>
 </body>
 </html>
