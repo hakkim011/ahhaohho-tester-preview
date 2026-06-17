@@ -56,23 +56,43 @@
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
   /* challenge list editor */
-  .challenge-input-row { display: flex; gap: 6px; margin-bottom: 8px; }
-  .challenge-input-row input {
-    flex: 1; background: var(--ed-surface); border: 1px solid var(--ed-border);
-    border-radius: 8px; padding: 7px 10px; color: var(--ed-text);
-    font-family: inherit; font-size: 13px; outline: none;
-  }
-  .challenge-input-row input:focus { border-color: var(--brand-neon); }
   .btn-add-ch {
     background: rgba(237,255,75,0.12); border: 1px solid rgba(237,255,75,0.3);
     border-radius: 8px; padding: 7px 12px; color: var(--brand-neon);
     font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
   }
   .btn-add-ch:hover { background: rgba(237,255,75,0.2); }
+
+  /* curation group */
+  .curation-group {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--ed-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .curation-group-hd { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+  .curation-name-in {
+    flex: 1; background: rgba(237,255,75,0.07); border: 1px solid rgba(237,255,75,0.22);
+    border-radius: 7px; padding: 6px 10px; color: var(--ed-text);
+    font-family: inherit; font-size: 12px; font-weight: 700; outline: none;
+  }
+  .curation-name-in::placeholder { color: rgba(237,255,75,0.4); font-weight: 400; }
+  .curation-name-in:focus { border-color: var(--brand-neon); }
+  .btn-del-group { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 14px; line-height: 1; }
+  .btn-del-group:hover { color: #ff6b6b; }
+  .ch-add-row { display: flex; gap: 6px; margin-bottom: 6px; }
+  .ch-add-row input {
+    flex: 1; background: var(--ed-surface); border: 1px solid var(--ed-border);
+    border-radius: 7px; padding: 6px 9px; color: var(--ed-text);
+    font-family: inherit; font-size: 12px; outline: none;
+  }
+  .ch-add-row input:focus { border-color: var(--brand-neon); }
+  .ch-add-row .btn-add-ch { padding: 6px 10px; font-size: 11px; }
   .ch-tag {
     display: inline-flex; align-items: center; gap: 5px;
     background: rgba(255,255,255,0.07); border: 1px solid var(--ed-border);
-    border-radius: 6px; padding: 4px 8px; font-size: 12px; margin: 3px;
+    border-radius: 6px; padding: 4px 8px; font-size: 12px; margin: 3px 3px 0 0;
   }
   .ch-tag button {
     background: none; border: none; color: rgba(255,255,255,0.3);
@@ -301,14 +321,8 @@
       <!-- 챌린지 목록 (챌린지 주차만) -->
       <div id="challenge-section">
         <div class="sec-label">챌린지 목록</div>
-        <div class="challenge-input-row">
-          <input type="text" id="ch-curation-input" placeholder="큐레이션명 (선택)" style="flex:1">
-        </div>
-        <div class="challenge-input-row">
-          <input type="text" id="ch-input" placeholder="챌린지명 입력" onkeydown="if(event.key==='Enter'&&!event.isComposing)addChallenge()">
-          <button class="btn-add-ch" onclick="addChallenge()">+ 추가</button>
-        </div>
-        <div id="ch-tags"></div>
+        <div id="curation-groups"></div>
+        <button class="btn-add-ch" style="width:100%;margin-top:2px" onclick="addCurationGroup()">+ 큐레이션 그룹 추가</button>
       </div>
 
     </div>
@@ -518,14 +532,19 @@ async function renderCard() {
     </div>`;
   }).join('');
 
-  const challengeHtml = data.isCh && challenges.length > 0 ? `
+  const hasChips = challenges.some(g => g.names && g.names.length > 0);
+  const challengeHtml = data.isCh && hasChips ? `
     <div class="card-section">
       <div class="card-section-title">🎯 이번 주 챌린지</div>
-      <div class="challenge-chips">
-        ${challenges.map(c => {
-          const label = typeof c === 'string' ? c : [c.curation, c.name].filter(Boolean).join(' > ');
-          return `<span class="challenge-chip">${label}</span>`;
-        }).join('')}
+      <div style="display:flex;flex-direction:column;gap:14px">
+        ${challenges.filter(g => g.names && g.names.length > 0).map(g => `
+          <div>
+            ${g.curation ? `<div style="font-size:11px;font-weight:800;color:rgba(11,18,21,0.4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">${escHtml(g.curation)}</div>` : ''}
+            <div class="challenge-chips">
+              ${g.names.map(n => `<span class="challenge-chip">${escHtml(n)}</span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
       </div>
     </div>` : '';
 
@@ -581,7 +600,7 @@ function onWeekChange() {
   const week = parseInt(document.getElementById('in-week').value);
   const data = WEEK_DATA[week];
   missions = [...data.missions];
-  challenges = [];
+  challenges = [{ curation: '', names: [] }];
   renderMissionEditor();
   renderChallengeSection();
   renderCard();
@@ -605,33 +624,63 @@ function renderChallengeSection() {
   const week = parseInt(document.getElementById('in-week').value);
   const sec = document.getElementById('challenge-section');
   sec.style.display = WEEK_DATA[week].isCh ? 'block' : 'none';
-  renderChallengeTags();
+  renderCurationGroups();
 }
 
-function addChallenge() {
-  const curationInput = document.getElementById('ch-curation-input');
-  const input = document.getElementById('ch-input');
-  const curation = curationInput.value.trim();
-  const name = input.value.trim();
-  if (!name) return;
-  challenges.push({ curation, name });
-  curationInput.value = '';
+/* challenges = [{curation: string, names: string[]}] */
+function addCurationGroup() {
+  challenges.push({ curation: '', names: [] });
+  renderCurationGroups();
+}
+
+function removeCurationGroup(gi) {
+  challenges.splice(gi, 1);
+  renderCurationGroups();
+  renderCard();
+}
+
+function updateCurationName(gi, val) {
+  challenges[gi].curation = val;
+  renderCard();
+}
+
+function addChallengeToGroup(gi) {
+  const input = document.getElementById(`ch-input-${gi}`);
+  const val = input.value.trim();
+  if (!val) return;
+  challenges[gi].names.push(val);
   input.value = '';
-  renderChallengeTags();
+  renderCurationGroups();
   renderCard();
 }
 
-function removeChallenge(i) {
-  challenges.splice(i, 1);
-  renderChallengeTags();
+function removeChallengeFromGroup(gi, ci) {
+  challenges[gi].names.splice(ci, 1);
+  renderCurationGroups();
   renderCard();
 }
 
-function renderChallengeTags() {
-  document.getElementById('ch-tags').innerHTML = challenges.map((c, i) => {
-    const label = typeof c === 'string' ? c : [c.curation, c.name].filter(Boolean).join(' > ');
-    return `<span class="ch-tag">${label}<button onclick="removeChallenge(${i})">✕</button></span>`;
-  }).join('');
+function renderCurationGroups() {
+  document.getElementById('curation-groups').innerHTML = challenges.map((group, gi) => `
+    <div class="curation-group">
+      <div class="curation-group-hd">
+        <input class="curation-name-in" type="text" placeholder="큐레이션명 (선택)"
+          value="${escHtml(group.curation)}"
+          oninput="challenges[${gi}].curation=this.value;renderCard()">
+        <button class="btn-del-group" onclick="removeCurationGroup(${gi})">✕</button>
+      </div>
+      <div class="ch-add-row">
+        <input type="text" id="ch-input-${gi}" placeholder="챌린지명 입력"
+          onkeydown="if(event.key==='Enter'&&!event.isComposing)addChallengeToGroup(${gi})">
+        <button class="btn-add-ch" onclick="addChallengeToGroup(${gi})">+ 추가</button>
+      </div>
+      <div>
+        ${group.names.map((n, ci) => `
+          <span class="ch-tag">${escHtml(n)}<button onclick="removeChallengeFromGroup(${gi},${ci})">✕</button></span>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
 }
 
 /* ── TAB ── */
@@ -744,7 +793,13 @@ function loadFromFile(input) {
       document.getElementById('in-kisu').value = s.kisu || '';
       document.getElementById('in-week').value = s.week || '1';
       missions = s.missions || [];
-      challenges = s.challenges || [];
+      // 구버전 호환: 문자열 배열 또는 {curation,name} 배열 → 새 구조로 변환
+      const raw = s.challenges || [];
+      if (raw.length && (typeof raw[0] === 'string' || raw[0].name !== undefined)) {
+        challenges = [{ curation: '', names: raw.map(c => typeof c === 'string' ? c : (c.name || '')) }];
+      } else {
+        challenges = raw.length ? raw : [{ curation: '', names: [] }];
+      }
       renderMissionEditor();
       renderChallengeSection();
       renderCard();
