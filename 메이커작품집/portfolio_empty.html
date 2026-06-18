@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아하오호 메이커 작품집</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --brand-black: #0B1215;
+    --brand-neon: #edff4b;
+    --bg: #FFF8F0;
+    --text-main: #1a1a1a;
+    --text-sub: #666;
+  }
+
+  body {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* COVER */
+  .cover {
+    background: var(--brand-neon);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+    padding: 52px 72px 60px;
+    gap: 32px;
+  }
+
+  .cover-deco-circle {
+    position: absolute;
+    width: 520px; height: 520px;
+    background: var(--brand-black);
+    border-radius: 50%;
+    top: -120px; right: -120px;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+  .cover-deco-dot {
+    position: absolute;
+    width: 180px; height: 180px;
+    background: var(--brand-black);
+    border-radius: 50%;
+    bottom: -40px; right: 220px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+  .cover-neon-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--brand-black);
+    opacity: 0.15;
+  }
+
+  .cover-top, .cover-main, .cover-bottom { position: relative; z-index: 2; }
+  .cover-top { display: flex; align-items: center; width: 100%; }
+
+  .cover-logo-main { width: 160px; max-width: 50%; margin-bottom: 36px; }
+
+  .cover-title-main {
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--brand-black);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .cover-title-main em {
+    display: inline;
+    font-style: normal;
+    background: var(--brand-black);
+    color: var(--brand-neon);
+    padding: 2px 10px 4px;
+    border-radius: 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .cover-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(11,18,21,0.45);
+    margin-top: 18px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .cover-bottom { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+  .cover-divider { width: 36px; height: 3px; background: var(--brand-black); border-radius: 2px; opacity: 0.3; margin-bottom: 2px; }
+  .cover-name { font-size: 20px; font-weight: 800; color: var(--brand-black); }
+  .cover-stats { display: flex; gap: 8px; }
+  .stat-chip {
+    background: rgba(11,18,21,0.1);
+    border: 1.5px solid rgba(11,18,21,0.18);
+    color: rgba(11,18,21,0.7);
+    border-radius: 6px;
+    padding: 5px 13px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .stat-chip span { color: var(--brand-black); font-weight: 800; }
+
+  /* EMPTY STATE */
+  .empty-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .empty-icon {
+    font-size: 56px;
+    margin-bottom: 8px;
+    opacity: 0.4;
+  }
+
+  .empty-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .empty-desc {
+    font-size: 14px;
+    color: var(--text-sub);
+    line-height: 1.7;
+  }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 40px 20px; font-size: 13px; color: #bbb; }
+  .footer strong { color: var(--brand-black); font-weight: 700; }
+
+  @media (max-width: 700px) {
+    .cover { padding: 40px 32px 48px; }
+    .cover-title-main { font-size: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-neon-bar"></div>
+  <div class="cover-deco-circle"></div>
+  <div class="cover-deco-dot"></div>
+
+  <div class="cover-top">
+    <img class="cover-logo-main" src="Logo1.svg" onerror="this.style.display='none'">
+  </div>
+
+  <div class="cover-main">
+    <div class="cover-title-main">메이커<br><em>작품집</em></div>
+    <div class="cover-subtitle">Maker Portfolio</div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-divider"></div>
+    <div class="cover-name">이희준</div>
+    <div class="cover-stats">
+      <div class="stat-chip">총 <span>0</span>개 작품</div>
+    </div>
+  </div>
+</div>
+
+<!-- EMPTY STATE -->
+<div class="empty-section">
+  <div class="empty-icon">🎨</div>
+  <div class="empty-title">아직 공개된 작품이 없어요</div>
+  <div class="empty-desc">모든 사람에게 공개된 게시물이 생기면<br>이곳에 작품이 채워져요.</div>
+</div>
+
+<div class="footer">
+  <strong>아하오호</strong>에서 만든 창작 기록 · futurelab.center
+</div>
+
+</body>
+</html>
