@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>시드 프로젝트 선정 보드 편집기</title>
+<title>피처드 프로젝트 선정 보드 편집기</title>
 <style>
   @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
@@ -408,7 +408,7 @@
   <aside class="editor">
     <div class="editor-top">
       <span class="editor-top-logo">🌱</span>
-      <span class="editor-top-title">시드 프로젝트 선정 보드</span>
+      <span class="editor-top-title">피처드 프로젝트 선정 보드</span>
     </div>
 
     <div class="editor-scroll">
@@ -487,7 +487,7 @@ function saveToFile() {
   const json = JSON.stringify(state, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const a = document.createElement('a');
-  const fileName = ['아크크', ...[kisu, week].filter(Boolean), '시드 프로젝트'].join(' ') + '.json';
+  const fileName = ['아크크', ...[kisu, week].filter(Boolean), '피처드 프로젝트'].join(' ') + '.json';
   a.download = fileName;
   a.href = URL.createObjectURL(blob);
   a.click();
@@ -683,7 +683,7 @@ function render() {
   }
 
   // PDF 파일명용 title 동적 업데이트
-  const titleLabel = ['아크크', ...[kisu, week].filter(Boolean), '시드 프로젝트'].join(' ');
+  const titleLabel = ['아크크', ...[kisu, week].filter(Boolean), '피처드 프로젝트'].join(' ');
   document.title = titleLabel;
 
   document.getElementById('board').innerHTML = `
@@ -692,7 +692,7 @@ function render() {
         <img class="board-logo" src="../메이커작품집/Logo1.svg" onerror="this.style.display='none'">
       </div>
       <div style="position:relative;z-index:2;display:flex;flex-direction:column;gap:12px;align-items:flex-end;text-align:right">
-        <div class="board-title">아크크${[kisu, week].filter(Boolean).length ? ' ' + [kisu, week].filter(Boolean).join(' · ') : ''}<br><em>시드 프로젝트</em></div>
+        <div class="board-title">아크크${[kisu, week].filter(Boolean).length ? ' ' + [kisu, week].filter(Boolean).join(' · ') : ''}<br><em>피처드 프로젝트</em></div>
         ${period ? `<div class="board-meta">${period}</div>` : ''}
       </div>
     </div>
@@ -709,7 +709,7 @@ function render() {
       <div class="board-continuation">
         ${rowsHtml(group)}
         <div class="cont-footer" style="margin-top:24px;padding-top:16px;border-top:1px solid rgba(11,18,21,0.08);display:flex;align-items:center;justify-content:space-between;">
-          <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:rgba(11,18,21,0.35);font-weight:500">아크크 ${[kisu, weekLabel].filter(Boolean).join(' ')} 시드 프로젝트</span>
+          <span style="font-family:'Pretendard',sans-serif;font-size:12px;color:rgba(11,18,21,0.35);font-weight:500">아크크 ${[kisu, weekLabel].filter(Boolean).join(' ')} 피처드 프로젝트</span>
           <span style="font-family:'Poppins',sans-serif;font-size:12px;color:rgba(11,18,21,0.25);font-weight:600">${pageNum} / ${totalPages}</span>
         </div>
       </div>`;
@@ -742,7 +742,7 @@ async function exportImage() {
   const prevTransform = wrap.style.transform;
   wrap.style.transform = 'scale(1)';
 
-  const baseName = ['아크크', ...[kisu, week].filter(Boolean), '시드 프로젝트'].join(' ');
+  const baseName = ['아크크', ...[kisu, week].filter(Boolean), '피처드 프로젝트'].join(' ');
 
   try {
     // 페이지1: 헤더 + board-body — 클론 후 로고만 숨겨서 레이아웃 유지
