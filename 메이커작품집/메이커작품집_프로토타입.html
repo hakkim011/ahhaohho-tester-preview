@@ -1152,6 +1152,12 @@ function showToast(msg) {
 }
 
 async function savePDF() {
+  // 라이브러리 로드 실패 시 print 폴백
+  if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+    window.print();
+    return;
+  }
+
   const btn = document.querySelector('.print-btn');
   const originalText = btn.innerHTML;
   btn.innerHTML = '저장 중...';
@@ -1165,12 +1171,15 @@ async function savePDF() {
     const canvas = await html2canvas(document.body, {
       scale: 2,
       useCORS: true,
+      allowTaint: true,
       logging: false,
       backgroundColor: '#FFF8F0',
+      imageTimeout: 0,
+      ignoreElements: el => el.classList.contains('print-btn') || el.classList.contains('app-cta') || el.classList.contains('modal-overlay'),
     });
 
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pdfW = pdf.internal.pageSize.getWidth();
     const pdfH = pdf.internal.pageSize.getHeight();
     const totalH = pdfW * (canvas.height / canvas.width);
@@ -1183,7 +1192,13 @@ async function savePDF() {
 
     pdf.save('아크크_작품집.pdf');
   } catch (e) {
-    showToast('PDF 저장에 실패했어요. 다시 시도해주세요.');
+    console.error('PDF 저장 실패:', e);
+    // 실패 시 print 다이얼로그 폴백
+    hideEls.forEach(el => el.style.visibility = '');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    window.print();
+    return;
   } finally {
     hideEls.forEach(el => el.style.visibility = '');
     btn.innerHTML = originalText;
