@@ -616,7 +616,7 @@
           <span id="post-count-summary" style="font-size:13px;color:#6b7280"></span>
           <label id="seed-filter-wrap" style="display:none; align-items:center; gap:6px; cursor:pointer; font-size:13px; color:#374151; user-select:none">
             <input type="checkbox" id="seed-only-checkbox" onchange="setSeedFilter(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:#050505">
-            🌱 피처드만 보기
+            ⭐ 피처드만 보기
           </label>
         </div>
         <select class="select-sm" id="post-sort" onchange="renderPosts()">
@@ -966,7 +966,7 @@
     </div>
     <div class="notif-preview">
       <strong>📬 알림 미리보기</strong><br>
-      "🌱 축하해요! 회원님의 작품이 피처드 프로젝트로 선정되었어요."
+      "⭐ 축하해요! 회원님의 작품이 피처드 프로젝트로 선정되었어요."
       <div class="notif-note">※ 알림 문구 상세는 화면 기획서 작성 예정</div>
     </div>
     <div class="modal-footer">
@@ -1251,10 +1251,10 @@ function renderMembers(data) {
     const chSeed = posts.filter(p => p.author === m.nickname && p.seedType === 'challenge').length;
     const freeSeed = posts.filter(p => p.author === m.nickname && (p.seedType === 'idea' || p.seedType === 'free')).length;
     const chSeedCell = chSeed > 0
-      ? `<span class="post-seed-badge seed-challenge" style="margin:0 auto">🌱 ${chSeed}</span>`
+      ? `<span class="post-seed-badge seed-challenge" style="margin:0 auto">⭐ ${chSeed}</span>`
       : `<span style="color:#d1d5db;font-size:13px">—</span>`;
     const freeSeedCell = freeSeed > 0
-      ? `<span class="post-seed-badge seed-idea" style="margin:0 auto">🌱 ${freeSeed}</span>`
+      ? `<span class="post-seed-badge seed-idea" style="margin:0 auto">⭐ ${freeSeed}</span>`
       : `<span style="color:#d1d5db;font-size:13px">—</span>`;
     return `
     <tr id="row-${m.id}">
@@ -1681,10 +1681,10 @@ function renderPosts() {
       ? `<span class="badge" style="background:#dbeafe;color:#1e40af;font-size:10px">챌린지</span>`
       : `<span class="badge" style="background:#ede9fe;color:#6d28d9;font-size:10px">자율창작</span>`;
     const seedBadge = p.seedType
-      ? `<div class="post-seed-badge seed-challenge">🌱 피처드</div>`
+      ? `<div class="post-seed-badge seed-challenge">⭐ 피처드</div>`
       : '';
     const testerBadge = p.isTester
-      ? `<span class="tester-badge is-tester">⭐ 체험단 ${p.cohort}기</span>`
+      ? `<span class="tester-badge is-tester">체험단 ${p.cohort}기</span>`
       : `<span class="tester-badge not-tester">일반 유저</span>`;
     const overlay = p.status === 'hidden'
       ? `<div class="post-thumb-overlay">숨겨짐</div>`
@@ -1751,13 +1751,13 @@ function openSeedModal(postId) {
   const typeInfo = document.getElementById('seed-type-info');
 
   if (p.type === 'challenge') {
-    typeInfo.textContent = '🌱 챌린지 게시물이므로 챌린지 피처드로 지정됩니다.';
+    typeInfo.textContent = '⭐ 챌린지 게시물이므로 챌린지 피처드로 지정됩니다.';
     wrap.style.display = 'block';
     // 현재 챌린지 미리 선택
     const sel = document.getElementById('seed-challenge-select');
     sel.value = p.challengeId || '';
   } else {
-    typeInfo.textContent = '🌱 자율 게시물이므로 자율 게시 피처드로 지정됩니다.';
+    typeInfo.textContent = '⭐ 자율 게시물이므로 자율 게시 피처드로 지정됩니다.';
     wrap.style.display = 'none';
   }
   openModal('modal-seed');
@@ -1774,7 +1774,7 @@ function confirmSeed() {
   closeModal('modal-seed');
   renderPosts();
   if (postTypeFilter === 'challenge') renderChallengeStats();
-  showToast(`🌱 ${p.author}의 게시물을 피처드로 지정했어요`);
+  showToast(`⭐ ${p.author}의 게시물을 피처드로 지정했어요`);
 }
 
 /* ── 숨김/노출 ── */
