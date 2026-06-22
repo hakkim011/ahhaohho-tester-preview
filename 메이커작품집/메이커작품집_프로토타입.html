@@ -779,6 +779,8 @@
     }
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -1149,8 +1151,44 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-function savePDF() {
-  window.print();
+async function savePDF() {
+  const btn = document.querySelector('.print-btn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '저장 중...';
+  btn.disabled = true;
+
+  const hideEls = document.querySelectorAll('.print-btn, .app-cta, .modal-overlay, .toast');
+  hideEls.forEach(el => el.style.visibility = 'hidden');
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const canvas = await html2canvas(document.body, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#FFF8F0',
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = pdf.internal.pageSize.getHeight();
+    const totalH = pdfW * (canvas.height / canvas.width);
+    const pages = Math.ceil(totalH / pdfH);
+
+    for (let i = 0; i < pages; i++) {
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, -(i * pdfH), pdfW, totalH);
+    }
+
+    pdf.save('아크크_작품집.pdf');
+  } catch (e) {
+    showToast('PDF 저장에 실패했어요. 다시 시도해주세요.');
+  } finally {
+    hideEls.forEach(el => el.style.visibility = '');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
 }
 </script>
 </body>
