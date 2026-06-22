@@ -1169,13 +1169,16 @@ async function savePDF() {
   try {
     const { jsPDF } = window.jspdf;
     const canvas = await html2canvas(document.body, {
-      scale: 2,
+      scale: 1.5,
       useCORS: true,
-      allowTaint: true,
       logging: false,
       backgroundColor: '#FFF8F0',
-      imageTimeout: 0,
-      ignoreElements: el => el.classList.contains('print-btn') || el.classList.contains('app-cta') || el.classList.contains('modal-overlay'),
+      imageTimeout: 15000,
+      ignoreElements: el =>
+        el.classList.contains('print-btn') ||
+        el.classList.contains('app-cta') ||
+        el.classList.contains('modal-overlay') ||
+        el.tagName === 'VIDEO',
     });
 
     const imgData = canvas.toDataURL('image/jpeg', 0.92);
@@ -1193,12 +1196,7 @@ async function savePDF() {
     pdf.save('아크크_작품집.pdf');
   } catch (e) {
     console.error('PDF 저장 실패:', e);
-    // 실패 시 print 다이얼로그 폴백
-    hideEls.forEach(el => el.style.visibility = '');
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-    window.print();
-    return;
+    showToast('PDF 저장 실패: ' + (e && e.message ? e.message : String(e)));
   } finally {
     hideEls.forEach(el => el.style.visibility = '');
     btn.innerHTML = originalText;
