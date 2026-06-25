@@ -776,6 +776,12 @@
     }
     .card-date { font-size: 13px; }
 
+    /* 마지막 카드 뒤 빈 페이지 방지 */
+    .card:last-child {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
     /* 카운트 뱃지·비디오 플레이 오버레이 숨김 */
     .card-count-badge,
     .media-cell.video-cell::after { display: none !important; }
