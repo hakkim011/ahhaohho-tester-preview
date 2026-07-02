@@ -535,7 +535,6 @@
                 <th>기수</th>
                 <th>운영 기간</th>
                 <th>참여 인원</th>
-                <th>탈락</th>
                 <th>상태</th>
                 <th>관리</th>
               </tr>
@@ -556,11 +555,6 @@
         </div>
 
         <div class="toolbar">
-          <select class="select-sm" id="filter-status" onchange="filterMembers()">
-            <option value="">전체 상태</option>
-            <option value="active">활성</option>
-            <option value="dropped">탈락</option>
-          </select>
           <input class="input-search" type="text" placeholder="이름 · 닉네임 · 전화번호 검색" oninput="filterMembers()" id="search-input">
           <div class="toolbar-right" style="display:flex;gap:8px">
             <button class="btn-secondary" onclick="openModal('modal-csv-import')">CSV 일괄 추가</button>
@@ -576,7 +570,6 @@
                 <th>닉네임</th>
                 <th>전화번호</th>
                 <th>기수</th>
-                <th>상태</th>
                 <th>태깅일</th>
                 <th style="text-align:center">챌린지 피처드</th>
                 <th style="text-align:center">자율창작 피처드</th>
@@ -927,8 +920,8 @@
   <div class="modal modal-sm">
     <div class="modal-title">탈락</div>
     <p class="modal-desc">
-      <strong id="drop-target-name"></strong>님을 탈락하시겠습니까?<br>
-      <span style="color:#dc2626">체험단 참여자 상태가 해제되며, 필요 시 명단에 다시 추가할 수 있습니다.</span>
+      <strong id="drop-target-name"></strong>님을 탈락 처리하시겠습니까?<br>
+      <span style="color:#dc2626">체험단 참여자 권한이 해제되고 목록에서 제거됩니다. 다시 참여시키려면 참여자 추가로 재등록해 주세요.</span>
     </p>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-drop-confirm')">취소</button>
@@ -1162,7 +1155,6 @@ function renderCohorts() {
         <td><strong>${c.num}기</strong></td>
         <td>${startFmt} ~ ${endFmt}</td>
         <td>${c.total}명</td>
-        <td>${c.dropped}명</td>
         <td><span class="badge ${st.cls}">${st.label}</span></td>
         <td><button class="btn-secondary" onclick="openModal('modal-edit-cohort')">수정</button></td>
       </tr>`;
@@ -1171,7 +1163,6 @@ function renderCohorts() {
   // 통계 카드
   const running = cohorts.filter(c => getCohortStatus(c.start, c.end).label === '운영 중');
   const totalMembers = cohorts.reduce((s, c) => s + c.total, 0);
-  const totalDropped = cohorts.reduce((s, c) => s + c.dropped, 0);
 
   const runningCard = running.length === 0
     ? `<div class="stat-card">
@@ -1198,7 +1189,6 @@ function renderCohorts() {
     <div class="stat-card">
       <div class="stat-label">전체 참여자</div>
       <div class="stat-value">${totalMembers}</div>
-      <div class="stat-sub">탈락 ${totalDropped}명 제외 시 ${totalMembers - totalDropped}명</div>
     </div>
   `;
 }
@@ -1253,15 +1243,11 @@ function renderMembers(data) {
       <td style="color:#6b7280">${m.nickname}</td>
       <td style="color:#6b7280">${m.phone}</td>
       <td>${m.cohort}기</td>
-      <td><span class="badge badge-${m.status}">${m.status === 'active' ? '활성' : '탈락'}</span></td>
       <td style="color:#9ca3af">${m.taggedAt}</td>
       <td style="text-align:center">${chSeedCell}</td>
       <td style="text-align:center">${freeSeedCell}</td>
       <td style="text-align:center;white-space:nowrap">
-        ${m.status === 'active'
-          ? `<button class="btn-danger" onclick="openDropConfirm(${m.id}, '${m.name}')">탈락</button>`
-          : `<span style="color:#d1d5db;font-size:13px">—</span>`
-        }
+        <button class="btn-danger" onclick="openDropConfirm(${m.id}, '${m.name}')">탈락</button>
       </td>
     </tr>`;
   }).join('');
@@ -1277,13 +1263,11 @@ function setCohortFilter(val, btn) {
 
 /* ── 필터링 ── */
 function filterMembers() {
-  const status = document.getElementById('filter-status').value;
   const q = document.getElementById('search-input').value.toLowerCase();
   const filtered = members.filter(m => {
     const matchCohort = !activeCohortFilter || String(m.cohort) === activeCohortFilter;
-    const matchStatus = !status || m.status === status;
     const matchQ = !q || m.name.toLowerCase().includes(q) || m.nickname.toLowerCase().includes(q) || m.phone.includes(q);
-    return matchCohort && matchStatus && matchQ;
+    return matchCohort && matchQ;
   });
   renderMembers(filtered);
 }
@@ -1346,11 +1330,11 @@ function openDropConfirm(id, name) {
 function confirmDrop() {
   if (!dropTargetId) return;
   const m = members.find(m => m.id === dropTargetId);
-  if (m) m.status = 'dropped';
+  members = members.filter(x => x.id !== dropTargetId);
   closeModal('modal-drop-confirm');
   dropTargetId = null;
   filterMembers();
-  showToast(`${m ? m.name : '참여자'}을(를) 탈락했어요`);
+  showToast(`${m ? m.name : '참여자'}을(를) 탈락 처리했어요`);
 }
 
 /* ── 기수 추가 ── */
