@@ -163,7 +163,7 @@
   /* header */
   .card-header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
   }
   .card-kisu {
     font-family: 'Pretendard', sans-serif; font-size: 13px; font-weight: 700;
@@ -243,7 +243,9 @@
     box-shadow: 0 4px 0 rgba(11,18,21,0.12);
   }
   .challenge-chip.has-thumb .chip-thumb {
-    width: 100%; height: 100px; object-fit: cover; display: block; background: #ececec;
+    width: 100%; height: 100px; display: block;
+    background-color: #ececec; background-size: cover;
+    background-position: center; background-repeat: no-repeat;
   }
   .challenge-chip.has-thumb .chip-name {
     padding: 9px 12px; font-size: 13px; font-weight: 700;
@@ -528,7 +530,7 @@ async function renderCard() {
   const week  = parseInt(document.getElementById('in-week').value);
   const data  = WEEK_DATA[week];
 
-  const kisuLabel = ['아크크', kisu].filter(Boolean).join(' ');
+  const kisuLabel = kisu;  // '아크크'는 로고로 대체 — 기수만 표시
   const weekLabel = `${week}주차`;
 
   const missionsHtml = missions.map(m => {
@@ -560,7 +562,7 @@ async function renderCard() {
               ${g.names.map(n => {
                 const img = thumbFor(n);
                 return img
-                  ? `<span class="challenge-chip has-thumb"><img class="chip-thumb" src="${escHtml(img)}" alt=""><span class="chip-name">${escHtml(n)}</span></span>`
+                  ? `<span class="challenge-chip has-thumb"><span class="chip-thumb" style="background-image:url('${img}')"></span><span class="chip-name">${escHtml(n)}</span></span>`
                   : `<span class="challenge-chip">${escHtml(n)}</span>`;
               }).join('')}
             </div>
@@ -735,7 +737,7 @@ function switchTab(tab) {
 
 async function renderFreeMissionCard() {
   const kisu = document.getElementById('in-kisu').value.trim();
-  const kisuLabel = ['아크크', kisu].filter(Boolean).join(' ');
+  const kisuLabel = kisu;  // '아크크'는 로고로 대체 — 기수만 표시
   const ahhaImg = window.AHHA_FAB || 'FAB(Ahha).svg';
 
   const card = document.getElementById('free-mission-card');
