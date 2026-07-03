@@ -229,12 +229,25 @@
   .mission-where img.where-ahha { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
 
   /* challenge chips */
-  .challenge-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .challenge-chips { display: flex; flex-wrap: wrap; gap: 12px; }
   .challenge-chip {
     display: inline-block; padding: 8px 16px;
     background: var(--brand-neon); border: none;
     border-radius: 100px; font-size: 14px; font-weight: 700; color: var(--brand-black);
     box-shadow: 0 4px 0 rgba(11,18,21,0.15);
+  }
+  /* 썸네일이 있는 챌린지 카드 */
+  .challenge-chip.has-thumb {
+    display: flex; flex-direction: column; padding: 0; width: 150px;
+    background: white; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 4px 0 rgba(11,18,21,0.12);
+  }
+  .challenge-chip.has-thumb .chip-thumb {
+    width: 100%; height: 100px; object-fit: cover; display: block; background: #ececec;
+  }
+  .challenge-chip.has-thumb .chip-name {
+    padding: 9px 12px; font-size: 13px; font-weight: 700;
+    color: var(--brand-black); line-height: 1.3;
   }
 
   /* free missions */
@@ -357,6 +370,8 @@
 
 </div>
 
+<datalist id="thumb-list"></datalist>
+<script src="thumbnails.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 
@@ -541,7 +556,12 @@ async function renderCard() {
           <div>
             ${g.curation ? `<div style="font-size:11px;font-weight:800;color:rgba(11,18,21,0.4);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">${escHtml(g.curation)}</div>` : ''}
             <div class="challenge-chips">
-              ${g.names.map(n => `<span class="challenge-chip">${escHtml(n)}</span>`).join('')}
+              ${g.names.map(n => {
+                const img = thumbFor(n);
+                return img
+                  ? `<span class="challenge-chip has-thumb"><img class="chip-thumb" src="${escHtml(img)}" alt=""><span class="chip-name">${escHtml(n)}</span></span>`
+                  : `<span class="challenge-chip">${escHtml(n)}</span>`;
+              }).join('')}
             </div>
           </div>
         `).join('')}
@@ -624,6 +644,20 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+/* ── 썸네일 매칭 (공백 제거 후 대소문자 무시 매칭) ── */
+function normKey(s) { return String(s).normalize('NFC').replace(/\s+/g, '').toLowerCase(); }
+function thumbFor(name) {
+  if (!window.THUMBS) return null;
+  const k = normKey(name);
+  const hit = window.THUMBS.find(t => t.key === k);
+  return hit ? hit.img : null;
+}
+function initThumbDatalist() {
+  if (!window.THUMBS) return;
+  const dl = document.getElementById('thumb-list');
+  if (dl) dl.innerHTML = window.THUMBS.map(t => `<option value="${escHtml(t.name)}">`).join('');
+}
+
 function renderChallengeSection() {
   const week = parseInt(document.getElementById('in-week').value);
   const sec = document.getElementById('challenge-section');
@@ -674,14 +708,15 @@ function renderCurationGroups() {
         <button class="btn-del-group" onclick="removeCurationGroup(${gi})">✕</button>
       </div>
       <div class="ch-add-row">
-        <input type="text" id="ch-input-${gi}" placeholder="챌린지명 입력"
+        <input type="text" id="ch-input-${gi}" placeholder="챌린지명 입력" list="thumb-list" autocomplete="off"
           onkeydown="if(event.key==='Enter'&&!event.isComposing)addChallengeToGroup(${gi})">
         <button class="btn-add-ch" onclick="addChallengeToGroup(${gi})">+ 추가</button>
       </div>
       <div>
-        ${group.names.map((n, ci) => `
-          <span class="ch-tag">${escHtml(n)}<button onclick="removeChallengeFromGroup(${gi},${ci})">✕</button></span>
-        `).join('')}
+        ${group.names.map((n, ci) => {
+          const img = thumbFor(n);
+          return `<span class="ch-tag">${img ? `<img src="${escHtml(img)}" style="width:22px;height:22px;border-radius:5px;object-fit:cover;margin-right:6px;vertical-align:middle">` : ''}${escHtml(n)}<button onclick="removeChallengeFromGroup(${gi},${ci})">✕</button></span>`;
+        }).join('')}
       </div>
     </div>
   `).join('');
@@ -814,6 +849,7 @@ function loadFromFile(input) {
 }
 
 /* ── INIT ── */
+initThumbDatalist();
 onWeekChange();
 </script>
 </body>
