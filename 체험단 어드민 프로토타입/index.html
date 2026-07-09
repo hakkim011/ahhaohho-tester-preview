@@ -321,13 +321,13 @@
   .seed-challenge { background: #dcfce7; color: #166534; }
   .seed-idea { background: #fef9c3; color: #854d0e; }
 
-  .tester-badge {
+  .crew-badge {
     display: inline-flex; align-items: center; gap: 3px;
     font-size: 10px; font-weight: 700; padding: 2px 6px;
     border-radius: 4px; white-space: nowrap;
   }
-  .tester-badge.is-tester { background: #fefce8; color: #854d0e; border: 1px solid #fde68a; }
-  .tester-badge.not-tester { background: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb; }
+  .crew-badge.is-crew { background: #fefce8; color: #854d0e; border: 1px solid #fde68a; }
+  .crew-badge.not-crew { background: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb; }
 
   /* 챌린지별 통계 테이블 */
   .challenge-stat-table-wrap {
@@ -1603,14 +1603,14 @@ function switchPage(pageId, el) {
 
 /* ── 프로젝트 관리 데이터 ── */
 let posts = [
-  { id:'P001', userId:'U001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',    author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#e0f2fe', emoji:'🎸', visibility:'public',  content:'페트병이랑 빨대로 악기를 만들어봤어요! 불면 소리가 나요.' },
-  { id:'P002', userId:'U002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isTester:true,  cohort:2, bg:'#fef3c7', emoji:'🏠', visibility:'public',  content:'우유팩 여러 개를 붙여서 2층 집을 만들었어요. 지붕도 만들었는데 진짜 비도 막을 수 있을 것 같아요. 창문도 뚫고 문도 달았는데 진짜 집처럼 보여서 너무 뿌듯했어요. 다음엔 3층도 만들어보고 싶어요!' },
-  { id:'P003', userId:'U003', type:'free',      challengeId:null,   challenge:null,                   author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden', seedType:null,       isTester:false, cohort:null, bg:'#fce7f3', emoji:'🚀', visibility:'public',  content:'제가 만든 로켓이에요. 발사 버튼도 달았어요!' },
-  { id:'P004', userId:'U004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal', seedType:null,       isTester:true,  cohort:1, bg:'#d1fae5', emoji:'🤖', visibility:'public',  content:'고무줄 동력으로 움직이는 로봇을 만들었어요. 태엽을 감으면 앞으로 걸어가요.' },
-  { id:'P005', userId:'U005', type:'free',      challengeId:null,   challenge:null,                   author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal', seedType:'idea',     isTester:true,  cohort:2, bg:'#ede9fe', emoji:'🌈', visibility:'public',  content:'색종이로 태양계 행성을 다 만들었어요. 토성 고리가 제일 어려웠어요.' },
-  { id:'P006', userId:'U008', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal', seedType:null,       isTester:false, cohort:null, bg:'#fff7ed', emoji:'🪁', visibility:'public',  content:'선풍기 바람으로 움직이는 돛단배를 만들었어요.' },
-  { id:'P007', userId:'U006', type:'free',      challengeId:null,   challenge:null,                   author:'은하수메이커', authorName:'윤태양', date:'2026.06.11', status:'normal', seedType:null,      isTester:true,  cohort:1, bg:'#fef9c3', emoji:'⭐', visibility:'private', content:'나만 보는 작품이에요.' },
-  { id:'P008', userId:'U004', type:'free',      challengeId:null,   challenge:null,                   author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal', seedType:null,       isTester:true,  cohort:2, bg:'#fdf4ff', emoji:'🌸', visibility:'public',  content:'꽃잎을 관찰하고 그림으로 그려봤어요. 꽃마다 모양이 다 달라서 신기했어요.' },
+  { id:'P001', userId:'U001', type:'challenge', challengeId:'C001', challenge:'나만의 악기 만들기',    author:'우주탐험가', authorName:'이희준', date:'2026.06.14', status:'normal', seedType:null,       isCrew:true,  cohort:2, bg:'#e0f2fe', emoji:'🎸', visibility:'public',  content:'페트병이랑 빨대로 악기를 만들어봤어요! 불면 소리가 나요.' },
+  { id:'P002', userId:'U002', type:'challenge', challengeId:'C002', challenge:'재활용 재료로 집 짓기', author:'별빛소년',   authorName:'김지민', date:'2026.06.13', status:'normal', seedType:'challenge', isCrew:true,  cohort:2, bg:'#fef3c7', emoji:'🏠', visibility:'public',  content:'우유팩 여러 개를 붙여서 2층 집을 만들었어요. 지붕도 만들었는데 진짜 비도 막을 수 있을 것 같아요. 창문도 뚫고 문도 달았는데 진짜 집처럼 보여서 너무 뿌듯했어요. 다음엔 3층도 만들어보고 싶어요!' },
+  { id:'P003', userId:'U003', type:'free',      challengeId:null,   challenge:null,                   author:'로켓제작자', authorName:'박서연', date:'2026.06.12', status:'hidden', seedType:null,       isCrew:false, cohort:null, bg:'#fce7f3', emoji:'🚀', visibility:'public',  content:'제가 만든 로켓이에요. 발사 버튼도 달았어요!' },
+  { id:'P004', userId:'U004', type:'challenge', challengeId:'C003', challenge:'움직이는 장난감 만들기', author:'달나라친구', authorName:'최민준', date:'2026.06.12', status:'normal', seedType:null,       isCrew:true,  cohort:1, bg:'#d1fae5', emoji:'🤖', visibility:'public',  content:'고무줄 동력으로 움직이는 로봇을 만들었어요. 태엽을 감으면 앞으로 걸어가요.' },
+  { id:'P005', userId:'U005', type:'free',      challengeId:null,   challenge:null,                   author:'행성탐험대', authorName:'정수아', date:'2026.06.11', status:'normal', seedType:'idea',     isCrew:true,  cohort:2, bg:'#ede9fe', emoji:'🌈', visibility:'public',  content:'색종이로 태양계 행성을 다 만들었어요. 토성 고리가 제일 어려웠어요.' },
+  { id:'P006', userId:'U008', type:'challenge', challengeId:'C004', challenge:'바람으로 움직이는 것',  author:'혜성관찰자', authorName:'임소율', date:'2026.06.11', status:'normal', seedType:null,       isCrew:false, cohort:null, bg:'#fff7ed', emoji:'🪁', visibility:'public',  content:'선풍기 바람으로 움직이는 돛단배를 만들었어요.' },
+  { id:'P007', userId:'U006', type:'free',      challengeId:null,   challenge:null,                   author:'은하수메이커', authorName:'윤태양', date:'2026.06.11', status:'normal', seedType:null,      isCrew:true,  cohort:1, bg:'#fef9c3', emoji:'⭐', visibility:'private', content:'나만 보는 작품이에요.' },
+  { id:'P008', userId:'U004', type:'free',      challengeId:null,   challenge:null,                   author:'달나라친구', authorName:'최민준', date:'2026.06.10', status:'normal', seedType:null,       isCrew:true,  cohort:2, bg:'#fdf4ff', emoji:'🌸', visibility:'public',  content:'꽃잎을 관찰하고 그림으로 그려봤어요. 꽃마다 모양이 다 달라서 신기했어요.' },
 ];
 
 const CHALLENGES = [
@@ -1726,9 +1726,9 @@ function renderPosts() {
     const seedBadge = p.seedType
       ? `<div class="post-seed-badge seed-challenge">⭐ 피처드</div>`
       : '';
-    const testerBadge = p.isTester
-      ? `<span class="tester-badge is-tester">체험단 ${p.cohort}기</span>`
-      : `<span class="tester-badge not-tester">일반 유저</span>`;
+    const crewBadge = p.isCrew
+      ? `<span class="crew-badge is-crew">체험단 ${p.cohort}기</span>`
+      : `<span class="crew-badge not-crew">일반 유저</span>`;
     const overlay = p.status === 'hidden'
       ? `<div class="post-thumb-overlay">숨겨짐</div>`
       : '';
@@ -1750,7 +1750,7 @@ function renderPosts() {
         </div>
         <div class="post-body" ${p.content ? `onmouseenter="startContentTooltip(event,this,'${p.id}')" onmouseleave="hideContentTooltip()"` : ''}>
           ${p.challenge ? `<div class="post-challenge">${p.challenge}</div>` : '<div class="post-challenge" style="color:#9ca3af">자율창작</div>'}
-          <div class="post-author" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${p.author} ${testerBadge}</div>
+          <div class="post-author" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${p.author} ${crewBadge}</div>
           <div class="post-date">${p.date} · P: ${p.id} · U: ${p.userId}</div>
           ${p.content ? `<div class="post-content">${p.content}</div>` : ''}
           ${seedBadge}
